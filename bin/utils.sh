@@ -1,124 +1,124 @@
 #!/usr/bin/env bash
 
 parseArgs() {
-	if [ "$#" -eq 0 ]; then
-		printUsage
-		exit 0
-	fi
-	optString="ranger-host:,auth-type:,ad-domain:,ad-url:,ad-base-dn:,ad-bind-dn:,ad-bind-password:,ad-user-object-class:,\
-	ldap-url:,ldap-user-dn-pattern:,ldap-group-search-filter:,ldap-base-dn:,ldap-bind-dn:,ldap-bind-password:,ldap-user-object-class:,\
-	java-home:,skip-install-mysql:,mysql-host:,mysql-root-password:,mysql-ranger-db-user-password:,\
-	skip-install-solr:,solr-host:,ranger-version:,ranger-repo-url:,restart-interval:,\
-	ranger-plugins:,emr-master-nodes:,emr-core-nodes:,emr-ssh-key:"
-	# IMPORTANT!! -o option can not be omitted, even there are no any short options!
-	# otherwise, parsing will go wrong!
-	OPTS=$(getopt -o "" -l "$optString" -- "$@")
-	exitCode=$?
-	if [ $exitCode -ne 0 ]; then
-		echo ""
-		printUsage
-		exit 1
-	fi
-	eval set -- "$OPTS"
-	while true; do
-		case "$1" in
-			--auth-type)
-				AUTH_TYPE="${2,,}"
-				shift 2
-				;;
-			--ad-domain)
-				AD_DOMAIN="$2"
-				shift 2
-				;;
-			--ad-url)
-				AD_URL="$2"
-				shift 2
-				;;
-			--ad-base-dn)
-				AD_BASE_DN="$2"
-				shift 2
-				;;
-			--ad-bind-dn)
-				AD_BIND_DN="$2"
-				shift 2
-				;;
-			--ad-bind-password)
-				AD_BIND_PASSWORD="$2"
-				shift 2
-				;;
-			--ad-user-object-class)
-				AD_USER_OBJECT_CLASS="$2"
-				shift 2
-				;;
-			--ldap-url)
-				LDAP_URL="$2"
-				shift 2
-				;;
-			--ldap-user-dn-pattern)
-				LDAP_USER_DN_PATTERN="$2"
-				shift 2
-				;;
-			--ldap-group-search-filter)
-				LDAP_GROUP_SEARCH_FILTER="$2"
-				shift 2
-				;;
-			--ldap-base-dn)
-				LDAP_BASE_DN="$2"
-				shift 2
-				;;
-			--ldap-bind-dn)
-				LDAP_BIND_DN="$2"
-				shift 2
-				;;
-			--ldap-bind-password)
-				LDAP_BIND_PASSWORD="$2"
-				shift 2
-				;;
-			--ldap-user-object-class)
-				LDAP_USER_OBJECT_CLASS="$2"
-				shift 2
-				;;
-			--java-home)
-				JAVA_HOME="$2"
-				shift 2
-				;;
-			--skip-install-mysql)
+  if [ "$#" -eq 0 ]; then
+    printUsage
+    exit 0
+  fi
+  optString="ranger-host:,auth-type:,ad-domain:,ad-url:,ad-base-dn:,ad-bind-dn:,ad-bind-password:,ad-user-object-class:,\
+  ldap-url:,ldap-user-dn-pattern:,ldap-group-search-filter:,ldap-base-dn:,ldap-bind-dn:,ldap-bind-password:,ldap-user-object-class:,\
+  java-home:,skip-install-mysql:,mysql-host:,mysql-root-password:,mysql-ranger-db-user-password:,\
+  skip-install-solr:,solr-host:,ranger-version:,ranger-repo-url:,restart-interval:,\
+  ranger-plugins:,emr-master-nodes:,emr-core-nodes:,emr-ssh-key:"
+  # IMPORTANT!! -o option can not be omitted, even there are no any short options!
+  # otherwise, parsing will go wrong!
+  OPTS=$(getopt -o "" -l "$optString" -- "$@")
+  exitCode=$?
+  if [ $exitCode -ne 0 ]; then
+    echo ""
+    printUsage
+    exit 1
+  fi
+  eval set -- "$OPTS"
+  while true; do
+    case "$1" in
+      --auth-type)
+        AUTH_TYPE="${2,,}"
+        shift 2
+        ;;
+      --ad-domain)
+        AD_DOMAIN="$2"
+        shift 2
+        ;;
+      --ad-url)
+        AD_URL="$2"
+        shift 2
+        ;;
+      --ad-base-dn)
+        AD_BASE_DN="$2"
+        shift 2
+        ;;
+      --ad-bind-dn)
+        AD_BIND_DN="$2"
+        shift 2
+        ;;
+      --ad-bind-password)
+        AD_BIND_PASSWORD="$2"
+        shift 2
+        ;;
+      --ad-user-object-class)
+        AD_USER_OBJECT_CLASS="$2"
+        shift 2
+        ;;
+      --ldap-url)
+        LDAP_URL="$2"
+        shift 2
+        ;;
+      --ldap-user-dn-pattern)
+        LDAP_USER_DN_PATTERN="$2"
+        shift 2
+        ;;
+      --ldap-group-search-filter)
+        LDAP_GROUP_SEARCH_FILTER="$2"
+        shift 2
+        ;;
+      --ldap-base-dn)
+        LDAP_BASE_DN="$2"
+        shift 2
+        ;;
+      --ldap-bind-dn)
+        LDAP_BIND_DN="$2"
+        shift 2
+        ;;
+      --ldap-bind-password)
+        LDAP_BIND_PASSWORD="$2"
+        shift 2
+        ;;
+      --ldap-user-object-class)
+        LDAP_USER_OBJECT_CLASS="$2"
+        shift 2
+        ;;
+      --java-home)
+        JAVA_HOME="$2"
+        shift 2
+        ;;
+      --skip-install-mysql)
         if [ "$2" != "true" -a "$2" != "false" ]; then
-            echo "For --skip-install-mysql option, only 'true' or 'false' is valid!"
-            exit 1
+          echo "For --skip-install-mysql option, only 'true' or 'false' is valid!"
+          exit 1
         fi
-				SKIP_INSTALL_MYSQL="$2"
-				shift 2
-				;;
-			--ranger-host)
+        SKIP_INSTALL_MYSQL="$2"
+        shift 2
+        ;;
+      --ranger-host)
         RANGER_HOST="$2"
         shift 2
         ;;
-			--mysql-host)
+      --mysql-host)
         MYSQL_HOST="$2"
         shift 2
         ;;
-			--mysql-root-password)
-				MYSQL_ROOT_PASSWORD="$2"
-				shift 2
-				;;
-			--mysql-ranger-db-user-password)
-				MYSQL_RANGER_DB_USER_PASSWORD="$2"
-				shift 2
-				;;
-			--skip-install-solr)
+      --mysql-root-password)
+        MYSQL_ROOT_PASSWORD="$2"
+        shift 2
+        ;;
+      --mysql-ranger-db-user-password)
+        MYSQL_RANGER_DB_USER_PASSWORD="$2"
+        shift 2
+        ;;
+      --skip-install-solr)
         if [ "$2" != "true" -a "$2" != "false" ]; then
           echo "For --skip-install-solr option, only 'true' or 'false' is valid!"
           exit 1
         fi
-				SKIP_INSTALL_SOLR="$2"
-				shift 2
-				;;
-			--solr-host)
+        SKIP_INSTALL_SOLR="$2"
+        shift 2
+        ;;
+      --solr-host)
         SOLR_HOST="$2"
         shift 2
         ;;
-			--ranger-version)
+      --ranger-version)
         RANGER_VERSION="$2"
         shift 2
         ;;
@@ -126,11 +126,11 @@ parseArgs() {
         RANGER_REPO_URL="$2"
         shift 2
         ;;
-			--ranger-plugins)
-			  IFS=', ' read -r -a RANGER_PLUGINS <<< "${2,,}"
-				shift 2
-				;;
-			--emr-master-nodes)
+      --ranger-plugins)
+        IFS=', ' read -r -a RANGER_PLUGINS <<< "${2,,}"
+        shift 2
+        ;;
+      --emr-master-nodes)
         # remove all blank chars, EMR_ZK_QUORUM looks like 'node1,node2,node3'
         EMR_ZK_QUORUM=${2//[[:blank:]]/}
         # split comma seperated string to array, EMR_MASTER_NODES is an array
@@ -142,37 +142,37 @@ parseArgs() {
         # usually, there should be a virtual IP play hiverserver2 role, but EMR has no such config.
         # here, we pick first master node as hiveserver2
         EMR_HIVE_SERVER2=${EMR_MASTER_NODES[0]}
-				shift 2
-				;;
-			--emr-core-nodes)
+        shift 2
+        ;;
+      --emr-core-nodes)
         IFS=', ' read -r -a EMR_CORE_NODES <<< "$2"
-				shift 2
-				;;
-			--emr-ssh-key)
-				EMR_SSH_KEY="$2"
-				shift 2
-				;;
-			--restart-interval)
-				RESTART_INTERVAL="$2"
-				shift 2
-				;;
-			--) # No more arguments
-				shift
-				break
-				;;
-			*)
-				echo ""
-				echo "Invalid option $1." >&2
-				printUsage
-				exit 1
-				;;
-		esac
-	done
-	shift $((OPTIND-1))
-	additionalOpts=$*
-	# merge EMR_MASTER_NODES and EMR_CORE_NODES to emr EMR_NODES
-	EMR_NODES=("${EMR_MASTER_NODES[@]}" "${EMR_CORE_NODES[@]}")
-	if [ "$AUTH_TYPE" = "ad" ]; then
+        shift 2
+        ;;
+      --emr-ssh-key)
+        EMR_SSH_KEY="$2"
+        shift 2
+        ;;
+      --restart-interval)
+        RESTART_INTERVAL="$2"
+        shift 2
+        ;;
+      --) # No more arguments
+        shift
+        break
+        ;;
+      *)
+        echo ""
+        echo "Invalid option $1." >&2
+        printUsage
+        exit 1
+        ;;
+    esac
+  done
+  shift $((OPTIND-1))
+  additionalOpts=$*
+  # merge EMR_MASTER_NODES and EMR_CORE_NODES to emr EMR_NODES
+  EMR_NODES=("${EMR_MASTER_NODES[@]}" "${EMR_CORE_NODES[@]}")
+  if [ "$AUTH_TYPE" = "ad" ]; then
     # check if all required config items are set
     adKeys=(AD_DOMAIN AD_URL AD_BASE_DN AD_BIND_DN AD_BIND_PASSWORD)
     for key in "${adKeys[@]}"; do
@@ -185,7 +185,7 @@ parseArgs() {
         # set default value if not set
         AD_USER_OBJECT_CLASS="person"
     fi
-	elif [ "$AUTH_TYPE" = "ldap" ]; then
+  elif [ "$AUTH_TYPE" = "ldap" ]; then
     ldapKeys=(LDAP_URL LDAP_BASE_DN LDAP_BIND_DN LDAP_BIND_PASSWORD)
       for key in "${ldapKeys[@]}"; do
         if [ "$(eval echo \$$key)" = "" ]; then
@@ -203,7 +203,7 @@ parseArgs() {
       if [ "$LDAP_USER_OBJECT_CLASS" = "" ]; then
           LDAP_USER_OBJECT_CLASS="inetOrgPerson"
       fi
-	fi
+  fi
 }
 
 resetConfigs() {
@@ -299,66 +299,66 @@ validateTime()
 }
 
 printUsage() {
-	echo ""
+  echo ""
   printHeading "RANGER-EMR-CLI-INSTALLER USAGE"
-	echo ""
-	echo "Actions:"
-	echo ""
-	echo "install                               Install all components"
-	echo "install-ranger                        Install ranger only"
-	echo "install-ranger-plugins                Install ranger plugin only"
-	echo "test-emr-ssh-connectivity             Test EMR ssh connectivity"
-	echo "test-emr-namenode-connectivity        Test EMR namenode connectivity"
-	echo "test-ldap-connectivity                Test LDAP connectivity"
-	echo "install-mysql                         Install MySQL"
-	echo "test-mysql-connectivity               Test MySQL connectivity"
-	echo "install-mysql-jdbc-driver             Install MySQL JDBC driver"
-	echo "install-jdk                           Install JDK8"
-	echo "download-ranger                       Download ranger"
-	echo "install-solr                          Install solr"
-	echo "test-solr-connectivity                Test solr connectivity"
-	echo "init-solr-as-ranger-audit-store       Test solr connectivity"
-	echo "init-ranger-admin-db                  Init ranger admin db"
-	echo "install-ranger-admin                  Install ranger admin"
-	echo "install-ranger-usersync               Install ranger usersync"
-	echo "help                                  Print help"
-	echo ""
-	echo "Options:"
-	echo ""
-	echo "--auth-type [ad|ldap]                 Authentication type, optional value: ad or ldap"
-	echo "--ad-domain                           Specify the domain name of windows ad server"
-	echo "--ad-url                              Specify the ldap url of windows ad server, i.e. ldap://10.0.0.1"
-	echo "--ad-base-dn                          Specify the base dn of windows ad server"
-	echo "--ad-bind-dn                          Specify the bind dn of windows ad server"
-	echo "--ad-bind-password                    Specify the bind password of windows ad server"
-	echo "--ad-user-object-class                Specify the user object class of windows ad server"
-	echo "--ldap-url                            Specify the ldap url of Open LDAP, i.e. ldap://10.0.0.1"
-	echo "--ldap-user-dn-pattern                Specify the user dn pattern of Open LDAP"
-	echo "--ldap-group-search-filter            Specify the group search filter of Open LDAP"
-	echo "--ldap-base-dn                        Specify the base dn of Open LDAP"
-	echo "--ldap-bind-dn                        Specify the bind dn of Open LDAP"
-	echo "--ldap-bind-password                  Specify the bind password of Open LDAP"
-	echo "--ldap-user-object-class              Specify the user object class of Open LDAP"
-	echo "--java-home                           Specify the JAVA_HOME path"
-	echo "--skip-install-mysql                  Specify If skip mysql installing or not"
-	echo "--ranger-host                         Specify the ranger server hostname or IP"
-	echo "--mysql-host                          Specify the mysql server hostname or IP"
-	echo "--mysql-root-password                 Specify the root password of mysql"
-	echo "--mysql-ranger-db-user-password       Specify the ranger db user password of mysql"
-	echo "--skip-install-solr                   Specify If skip solr installing or not"
-	echo "--solr-host                           Specify the solr server hostname or IP"
-	echo "--ranger-version                      Specify the ranger version"
-	echo "--ranger-repo-url                     Specify the ranger repository url"
-	echo "--ranger-plugins                      Specify what plugins will be installed(comma separated values), i.e. hdfs,hive,hbase"
-	echo "--emr-master-nodes                    Specify master nodes list of EMR cluster(comma separated values), i.e. 10.0.0.1,10.0.0.2,10.0.0.3"
-	echo "--emr-core-nodes                      Specify core nodes list of EMR cluster(comma separated values), i.e. 10.0.0.4,10.0.0.5,10.0.0.6"
-	echo "--emr-ssh-key                         Specify the path of ssh key to connect EMR nodes"
-	echo "--restart-interval                    Specify the restart interval"
-	echo ""
-	echo "Samples:"
-	echo ""
-	echo "1. All-In-One install, install Ranger, then integrate to a Windows AD server and a multi-master EMR cluster"
-	echo ""
+  echo ""
+  echo "Actions:"
+  echo ""
+  echo "install                               Install all components"
+  echo "install-ranger                        Install ranger only"
+  echo "install-ranger-plugins                Install ranger plugin only"
+  echo "test-emr-ssh-connectivity             Test EMR ssh connectivity"
+  echo "test-emr-namenode-connectivity        Test EMR namenode connectivity"
+  echo "test-ldap-connectivity                Test LDAP connectivity"
+  echo "install-mysql                         Install MySQL"
+  echo "test-mysql-connectivity               Test MySQL connectivity"
+  echo "install-mysql-jdbc-driver             Install MySQL JDBC driver"
+  echo "install-jdk                           Install JDK8"
+  echo "download-ranger                       Download ranger"
+  echo "install-solr                          Install solr"
+  echo "test-solr-connectivity                Test solr connectivity"
+  echo "init-solr-as-ranger-audit-store       Test solr connectivity"
+  echo "init-ranger-admin-db                  Init ranger admin db"
+  echo "install-ranger-admin                  Install ranger admin"
+  echo "install-ranger-usersync               Install ranger usersync"
+  echo "help                                  Print help"
+  echo ""
+  echo "Options:"
+  echo ""
+  echo "--auth-type [ad|ldap]                 Authentication type, optional value: ad or ldap"
+  echo "--ad-domain                           Specify the domain name of windows ad server"
+  echo "--ad-url                              Specify the ldap url of windows ad server, i.e. ldap://10.0.0.1"
+  echo "--ad-base-dn                          Specify the base dn of windows ad server"
+  echo "--ad-bind-dn                          Specify the bind dn of windows ad server"
+  echo "--ad-bind-password                    Specify the bind password of windows ad server"
+  echo "--ad-user-object-class                Specify the user object class of windows ad server"
+  echo "--ldap-url                            Specify the ldap url of Open LDAP, i.e. ldap://10.0.0.1"
+  echo "--ldap-user-dn-pattern                Specify the user dn pattern of Open LDAP"
+  echo "--ldap-group-search-filter            Specify the group search filter of Open LDAP"
+  echo "--ldap-base-dn                        Specify the base dn of Open LDAP"
+  echo "--ldap-bind-dn                        Specify the bind dn of Open LDAP"
+  echo "--ldap-bind-password                  Specify the bind password of Open LDAP"
+  echo "--ldap-user-object-class              Specify the user object class of Open LDAP"
+  echo "--java-home                           Specify the JAVA_HOME path"
+  echo "--skip-install-mysql                  Specify If skip mysql installing or not"
+  echo "--ranger-host                         Specify the ranger server hostname or IP"
+  echo "--mysql-host                          Specify the mysql server hostname or IP"
+  echo "--mysql-root-password                 Specify the root password of mysql"
+  echo "--mysql-ranger-db-user-password       Specify the ranger db user password of mysql"
+  echo "--skip-install-solr                   Specify If skip solr installing or not"
+  echo "--solr-host                           Specify the solr server hostname or IP"
+  echo "--ranger-version                      Specify the ranger version"
+  echo "--ranger-repo-url                     Specify the ranger repository url"
+  echo "--ranger-plugins                      Specify what plugins will be installed(comma separated values), i.e. hdfs,hive,hbase"
+  echo "--emr-master-nodes                    Specify master nodes list of EMR cluster(comma separated values), i.e. 10.0.0.1,10.0.0.2,10.0.0.3"
+  echo "--emr-core-nodes                      Specify core nodes list of EMR cluster(comma separated values), i.e. 10.0.0.4,10.0.0.5,10.0.0.6"
+  echo "--emr-ssh-key                         Specify the path of ssh key to connect EMR nodes"
+  echo "--restart-interval                    Specify the restart interval"
+  echo ""
+  echo "Samples:"
+  echo ""
+  echo "1. All-In-One install, install Ranger, then integrate to a Windows AD server and a multi-master EMR cluster"
+  echo ""
   cat << EOF | sed 's/^ *//'
   sudo ranger-emr-cli-installer/bin/setup.sh install \\
   --ranger-host $(hostname -i) \\
@@ -384,10 +384,10 @@ printUsage() {
   --emr-ssh-key /home/ec2-user/key.pem \\
   --restart-interval 30
 EOF
-	echo ""
-	echo "2. All-In-One install, install Ranger, then integrate to a Open LDAP server and a multi-master EMR cluster"
-	echo ""
-	cat << EOF | sed 's/^ *//'
+  echo ""
+  echo "2. All-In-One install, install Ranger, then integrate to a Open LDAP server and a multi-master EMR cluster"
+  echo ""
+  cat << EOF | sed 's/^ *//'
   sudo ranger-emr-cli-installer/bin/setup.sh install \\
   --ranger-host $(hostname -i) \\
   --java-home /usr/lib/jvm/java \\
@@ -413,10 +413,10 @@ EOF
   --emr-ssh-key /home/ec2-user/key.pem \\
   --restart-interval 30
 EOF
-	echo ""
-	echo "3. Integrate second EMR cluster"
-	echo ""
-	cat << EOF | sed 's/^ *//'
+  echo ""
+  echo "3. Integrate second EMR cluster"
+  echo ""
+  cat << EOF | sed 's/^ *//'
   sudo ranger-emr-cli-installer/bin/setup.sh install-ranger-plugins \\
   --ranger-host $(hostname -i) \\
   --solr-host $(hostname -i) \\
@@ -427,5 +427,5 @@ EOF
   --emr-ssh-key /home/ec2-user/key.pem \\
   --restart-interval 30
 EOF
-	echo ""
+  echo ""
 }
