@@ -30,14 +30,15 @@ OPT_KEYS=(
 source "$APP_HOME/bin/utils.sh"
 source "$APP_HOME/bin/funcs.sh"
 
+resetConfigs
+parseArgs "$@"
+printConfigs
+
 # ----------------------------------------------    Scripts Entrance    ---------------------------------------------- #
 
 case $1 in
 install)
     shift
-    resetConfigs
-    parseArgs "$@"
-    printConfigs
     testEmrSshConnectivity
     testEmrNamenodeConnectivity
     testLdapConnectivity
@@ -65,11 +66,8 @@ install)
     printHeading "ALL DONE!!"
     ;;
 install-ranger)
-    printHeading "STARTING SETUP!!"
     shift
-    resetConfigs
-    parseArgs "$@"
-    printConfigs
+    printHeading "STARTING SETUP!!"
     testLdapConnectivity
     if [ "$SKIP_INSTALL_MYSQL" = "false" ]; then
         installMySqlIfNotExists
@@ -93,9 +91,6 @@ install-ranger)
     ;;
 install-ranger-plugins)
     shift
-    resetConfigs
-    parseArgs "$@"
-    printConfigs
     testEmrSshConnectivity
     testEmrNamenodeConnectivity
     testSolrConnectivityFromEmrNodes
@@ -105,32 +100,22 @@ install-ranger-plugins)
     ;;
 test-emr-ssh-connectivity)
     shift
-    resetConfigs
-    parseArgs "$@"
     testEmrSshConnectivity
     ;;
 test-emr-namenode-connectivity)
     shift
-    resetConfigs
-    parseArgs "$@"
     testEmrNamenodeConnectivity
     ;;
 test-ldap-connectivity)
     shift
-    resetConfigs
-    parseArgs "$@"
     testLdapConnectivity
     ;;
 install-mysql)
     shift
-    resetConfigs
-    parseArgs "$@"
     installMySqlIfNotExists
     ;;
 test-mysql-connectivity)
     shift
-    resetConfigs
-    parseArgs "$@"
     testMySqlConnectivity
     ;;
 install-mysql-jdbc-driver)
@@ -138,57 +123,43 @@ install-mysql-jdbc-driver)
     ;;
 install-jdk)
     shift
-    resetConfigs
-    parseArgs "$@"
     installJdk8IfNotExists
     ;;
 download-ranger)
     shift
-    resetConfigs
-    parseArgs "$@"
     downloadRanger
     ;;
 install-solr)
     shift
-    resetConfigs
-    parseArgs "$@"
     installSolrIfNotExists
     ;;
 test-solr-connectivity)
     shift
-    resetConfigs
-    parseArgs "$@"
     testSolrConnectivity
     ;;
 init-solr-as-ranger-audit-store)
     shift
-    resetConfigs
-    parseArgs "$@"
     initSolrAsRangerAuditStore
     ;;
 init-ranger-admin-db)
     shift
-    resetConfigs
-    parseArgs "$@"
     initRangerAdminDb
     ;;
 install-ranger-admin)
     shift
-    resetConfigs
-    parseArgs "$@"
     initRangerAdminDb
     installRangerAdmin
     ;;
 install-ranger-usersync)
     shift
-    resetConfigs
-    parseArgs "$@"
     installRangerUsersync
     ;;
 help)
+    shift
     printUsage
     ;;
 *)
+    shift
     printUsage
     ;;
 esac

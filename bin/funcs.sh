@@ -469,7 +469,7 @@ installRangerHdfsPlugin() {
     sed -i "s|@RANGER_HOST@|$RANGER_HOST|g" $confFile
     installHome=/opt/ranger-$RANGER_VERSION-hdfs-plugin
     for masterNode in "${EMR_MASTER_NODES[@]}"; do
-        printHeading "INSTALL RANGER HDFS PLUGIN ON MASTER NODE: [ $masterNode ]: "
+        printHeading "INSTALL RANGER HDFS PLUGIN ON MASTER NODE [ $masterNode ]: "
         ssh -o StrictHostKeyChecking=no -i $EMR_SSH_KEY -T hadoop@$masterNode sudo rm -rf $installFilesDir $installHome
         # NOTE: we can't copy files from local /tmp/plugin-dir to remote /opt/plugin-dir,
         # because hadoop user has no write permission at /opt
@@ -488,10 +488,10 @@ EOF
 restartNamenode() {
     printHeading "RESTART NAMENODE"
     for masterNode in "${EMR_MASTER_NODES[@]}"; do
-        echo "STOP NAMENODE ON MASTER NODE: [ $masterNode ]"
+        echo "STOP NAMENODE ON MASTER NODE [ $masterNode ]"
         ssh -o StrictHostKeyChecking=no -i $EMR_SSH_KEY -T hadoop@$masterNode sudo systemctl stop hadoop-hdfs-namenode
         sleep $RESTART_INTERVAL
-        echo "START NAMENODE ON MASTER NODE: [ $masterNode ]"
+        echo "START NAMENODE ON MASTER NODE [ $masterNode ]"
         ssh -o StrictHostKeyChecking=no -i $EMR_SSH_KEY -T hadoop@$masterNode sudo systemctl start hadoop-hdfs-namenode
         sleep $RESTART_INTERVAL
     done
@@ -512,7 +512,7 @@ installRangerHivePlugin() {
     sed -i "s|@RANGER_HOST@|$RANGER_HOST|g" $confFile
     installHome=/opt/ranger-$RANGER_VERSION-hive-plugin
     for masterNode in "${EMR_MASTER_NODES[@]}"; do
-        printHeading "INSTALL RANGER HIVE PLUGIN ON MASTER NODE: [ $masterNode ] "
+        printHeading "INSTALL RANGER HIVE PLUGIN ON MASTER NODE [ $masterNode ] "
         ssh -o StrictHostKeyChecking=no -i $EMR_SSH_KEY -T hadoop@$masterNode sudo rm -rf $installFilesDir $installHome
         # NOTE: we can't copy files from local /tmp/plugin-dir to remote /opt/plugin-dir,
         # because hadoop user has no write permission at /opt
@@ -531,10 +531,10 @@ EOF
 restartHiveServer2() {
     printHeading "RESTART HIVESERVER2"
     for masterNode in "${EMR_MASTER_NODES[@]}"; do
-        echo "STOP HIVESERVER2 ON MASTER NODE: [ $masterNode ]"
+        echo "STOP HIVESERVER2 ON MASTER NODE [ $masterNode ]"
         ssh -o StrictHostKeyChecking=no -i $EMR_SSH_KEY -T hadoop@$masterNode sudo systemctl stop hive-server2
         sleep $RESTART_INTERVAL
-        echo "START HIVESERVER2 ON MASTER NODE: [ $masterNode ]"
+        echo "START HIVESERVER2 ON MASTER NODE [ $masterNode ]"
         ssh -o StrictHostKeyChecking=no -i $EMR_SSH_KEY -T hadoop@$masterNode sudo systemctl start hive-server2
         sleep $RESTART_INTERVAL
     done
@@ -554,7 +554,7 @@ installRangerHBasePlugin() {
     sed -i "s|@SOLR_HOST@|$SOLR_HOST|g" $confFile
     sed -i "s|@RANGER_HOST@|$RANGER_HOST|g" $confFile
     for node in "${EMR_NODES[@]}"; do
-        printHeading "INSTALL RANGER HBASE PLUGIN ON NODE: [ $masterNode ]: "
+        printHeading "INSTALL RANGER HBASE PLUGIN ON NODE [ $masterNode ]"
         installHome=/opt/ranger-$RANGER_VERSION-hbase-plugin
         ssh -o StrictHostKeyChecking=no -i $EMR_SSH_KEY -T hadoop@$node sudo rm -rf $installFilesDir $installHome
         # NOTE: we can't copy files from local /tmp/plugin-dir to remote /opt/plugin-dir,
@@ -574,16 +574,16 @@ EOF
 restartHbase() {
     printHeading "RESTART HBASE"
     for node in "${EMR_MASTER_NODES[@]}"; do
-        echo "STOP HBASE-MASTER ON MASTER NODE: [ $node ]"
+        echo "STOP HBASE-MASTER ON MASTER NODE [ $node ]"
         ssh -o StrictHostKeyChecking=no -i $EMR_SSH_KEY -T hadoop@$node sudo systemctl stop hbase-master
         sleep $RESTART_INTERVAL
-        echo "START HBASE-MASTER ON MASTER NODE: [ $node ]"
+        echo "START HBASE-MASTER ON MASTER NODE [ $node ]"
         ssh -o StrictHostKeyChecking=no -i $EMR_SSH_KEY -T hadoop@$node sudo systemctl start hbase-master
         sleep $RESTART_INTERVAL
     done
     # stop regionserver first, then master
     for node in "${EMR_CORE_NODES[@]}"; do
-        echo "RESTART HBASE-REGIONSERVER ON CORE NODE: [ $node ]"
+        echo "RESTART HBASE-REGIONSERVER ON CORE NODE [ $node ]"
         # Get remote hostname (just hostname, not fqdn, only this value can trigger graceful_stop.sh work with hbase-daemon.sh
         # not hbase-daemons.sh, EMR has no this file.
         remoteHostname=$(ssh -o StrictHostKeyChecking=no -i $EMR_SSH_KEY -T hadoop@$node hostname)
