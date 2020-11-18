@@ -18,7 +18,7 @@ DEFAULT_HOSTNAME=$(hostname -i)
 DEFAULT_RANGER_VERSION='2.1.0'
 DEFAULT_RESTART_INTERVAL=30
 
-CONF_KEYS=(
+OPT_KEYS=(
     AUTH_TYPE
     AD_DOMAIN AD_URL AD_BASE_DN AD_BIND_DN AD_BIND_PASSWORD AD_USER_OBJECT_CLASS
     LDAP_URL LDAP_USER_DN_PATTERN LDAP_GROUP_SEARCH_FILTER LDAP_BASE_DN LDAP_BIND_DN LDAP_BIND_PASSWORD LDAP_USER_OBJECT_CLASS
@@ -29,9 +29,6 @@ CONF_KEYS=(
 
 source "$APP_HOME/bin/utils.sh"
 source "$APP_HOME/bin/funcs.sh"
-
-# Change mod to 600 in case key file is ready
-#DEFAULT_EMR_SSH_KEY='/home/ec2-user/key.pem'
 
 # ----------------------------------------------    Scripts Entrance    ---------------------------------------------- #
 

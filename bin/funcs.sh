@@ -15,7 +15,7 @@ installJdk8IfNotExists() {
 # -------------------------------------------------   AD Operations   ------------------------------------------------ #
 
 testLdapConnectivity() {
-    printHeading "TEST AD CONNECTIVITY"
+    printHeading "TEST AD/LDAP CONNECTIVITY"
     ldapsearch -VV &>/dev/null
     if [ ! "$?" = "0" ]; then
         echo "Install ldapsearch for AD connectivity test"
@@ -69,7 +69,7 @@ installMySqlIfNotExists() {
 installMySqlCliIfNotExists() {
     mysql -V &>/dev/null
     if [ ! "$?" = "0" ]; then
-        printHeading "INSTALL MYSQL CLIENT"
+        printHeading "INSTALL MYSQL CLI CLIENT FOR CONNECTIVITY TESTING"
         echo "MySQL client has not been installed yet, will install right now!"
         yum -y install mysql-community-server
         if [ ! -f /tmp/mysql57-community-release-el7-11.noarch.rpm ]; then
@@ -453,14 +453,6 @@ initRangerHbaseRepo() {
         -X POST http://$RANGER_HOST:6080/service/public/api/repository/
     echo ""
 }
-
-#initRangerPrestoRepo() {
-#    printHeading "INIT RANGER HBASE REPO"
-#    cp $APP_HOME/policy/hbase-repo.json $APP_HOME/policy/.hbase-repo.json
-#    sed -i "s|@NAMENODE@|$NAMENODE|g" $APP_HOME/policy/.hbase-repo.json
-#    curl -iv -u admin:admin -d @$APP_HOME/policy/.hbase-repo.json -H "Content-Type: application/json" \
-#    -X POST http://$RANGER_HOST:6080/service/public/api/repository/
-#}
 
 installRangerHdfsPlugin() {
     # Must init repo first before install plugin

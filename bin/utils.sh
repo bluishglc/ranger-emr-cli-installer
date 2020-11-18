@@ -207,7 +207,7 @@ parseArgs() {
 }
 
 resetConfigs() {
-    for key in "${CONF_KEYS[@]}"; do
+    for key in "${OPT_KEYS[@]}"; do
         eval $key=""
     done
     # Set default value for some configs if there are not set in command line.
@@ -245,7 +245,7 @@ resetConfigs() {
 
 printConfigs() {
     printHeading "CONFIGURATION ITEMS"
-    for key in "${CONF_KEYS[@]}"; do
+    for key in "${OPT_KEYS[@]}"; do
         case $key in
         EMR_NODES|EMR_MASTER_NODES|EMR_CORE_NODES|RANGER_PLUGINS)
             val=$(eval echo \${${key}[@]})
@@ -260,7 +260,7 @@ printConfigs() {
 }
 
 validateConfigs() {
-    for key in "${CONF_KEYS[@]}"; do
+    for key in "${OPT_KEYS[@]}"; do
         val=$(eval echo \$$key)
         if [ "$val" = "" ]; then
             echo "Required config item [ $key ] is not set, installing process will exit!"
@@ -273,9 +273,9 @@ printHeading()
 {
     title="$1"
     if [ "$TERM" = "dumb" -o "$TERM" = "unknown" ]; then
-        paddingWidth=40
+        paddingWidth=60
     else
-        paddingWidth=$((($(tput cols)-${#title})/2-3))
+        paddingWidth=$((($(tput cols)-${#title})/2-5))
     fi
     printf "\n%${paddingWidth}s"|tr ' ' '='
     printf "    $title    "
