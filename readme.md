@@ -38,9 +38,9 @@ So, a fully Ranger installation will cover following jobs:
 
 ## 2. Download
 
-1. First all, setup a clean Linux server, login and switch to root user.
+1. First of all, setup a clean linux server, login and switch to `root` user.
 
-2. Install Git and check out this tool.
+2. Install git and check out this project.
 
 ```bash
 yum -y install git
@@ -49,12 +49,12 @@ git clone https://github.com/bluishglc/ranger-emr-cli-installer.git /home/ec2-us
 
 ## 3. Usage
 
-After downloaded, let's print usage to check if the cli tool is ready to use.
+After download, let's print usage to check if the cli tool is ready to use:
 
 ```bash
 sh /home/ec2-user/ranger-emr-cli-installer/bin/setup.sh help
 ```
-then, the console will print all actions and options supported by this CLI tool:
+if goes well, the console will print all actions and options supported by this CLI tool:
 
 ```
 =============================    RANGER-EMR-CLI-INSTALLER USAGE    =============================
@@ -114,11 +114,13 @@ Options:
 
 ```
 
+This means the tool is ready to use.
+
 ## 4. Examples
 
-To illustrate how to use this cli tool, let's assume we have a following environment:
+To explain how to use this cli tool, assume we have following environment:
 
-**A Windows AD Server**
+**A Windows AD Server:**
 
 Info Item Key|Info Item Value
 ---------|-----
@@ -129,8 +131,7 @@ Bind DN|cn=ranger,ou=service accounts,dc=example,dc=com
 Bind DN Password|Admin1234!
 User Object Class|person
 
-
-**An Open LDAP Server**
+**An Open LDAP Server:**
 
 Info Item Key|Info Item Value
 ---------|-----
@@ -143,7 +144,7 @@ Bind Group Search Filter|(member=uid={0},dc=example,dc=com)
 User Object Class|inetOrgPerson
 
 
-**A Multi-Master EMR Cluster**
+**A Multi-Master EMR Cluster:**
 
 Node|IP
 ---|---
@@ -151,7 +152,7 @@ Master Nodes|10.0.0.177,10.0.0.199,10.0.0.21
 Core Nodes|10.0.0.114,10.0.0.136
 
 
-**A Normal EMR Cluster**
+**A Normal EMR Cluster:**
 
 Node|IP
 ---|---
