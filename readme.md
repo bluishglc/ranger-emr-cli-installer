@@ -16,25 +16,25 @@ Let’s check out Ranger's architecture:
 
 Ranger has 5 parts:
 
-`1. Ranger Admin Service`
-`2. Ranger UserSync Service`
-`3. A Backend RDB for Storing User's Authorization`
-`4. A Solr Server for Storing Audit Log`
-`5. A Series of Plugins for Big Data Components/Services`
+1. Ranger Admin Service
+2. Ranger UserSync Service
+3. A Backend RDB for Storing User's Authorization
+4. A Solr Server for Storing Audit Log
+5. A Series of Plugins for Big Data Components/Services
 
 Besides above, there are 2 external dependencies For Ranger to integrate:
 
-`6. A Windows AD or Open LDAD Server as Authentication Channel`
-`7. A Hadoop (AWS EMR) Cluster to Be Managed by Ranger`
+6. A Windows AD or Open LDAD Server as Authentication Channel
+7. A Hadoop (AWS EMR) Cluster to Be Managed by Ranger
 
 So, a fully Ranger installation will cover following jobs:
 
-`1. Install JDK (Required by Ranger Admin and Solr)`
-`2. Install MySQL (As Ranger Backend RDB)`
-`3. Install Solr (As Ranger Audit Store)`
-`4. Install Ranger Admin (and Integrate with AD/LDAP Server)`
-`5. Install Ranger UserSync (and Integrate with AD/LDAP Server)`
-`6. Install Ranger Plugins (i.e. HDFS, Hive, HBase and so on)`
+1. Install JDK (Required by Ranger Admin and Solr)
+2. Install MySQL (As Ranger Backend RDB)
+3. Install Solr (As Ranger Audit Store)
+4. Install Ranger Admin (and Integrate with AD/LDAP Server)
+5. Install Ranger UserSync (and Integrate with AD/LDAP Server)
+6. Install Ranger Plugins (i.e. HDFS, Hive, HBase and so on)
 
 ## 2. Download
 
@@ -118,7 +118,7 @@ Options:
 
 To illustrate how to use this cli tool, let's assume we have a following environment:
 
-- A Windows AD Server
+**A Windows AD Server**
 
 Info Item Key|Info Item Value
 ---------|-----
@@ -130,7 +130,7 @@ Bind DN Password|Admin1234!
 User Object Class|person
 
 
-- An Open LDAP Server
+**An Open LDAP Server**
 
 Info Item Key|Info Item Value
 ---------|-----
@@ -143,7 +143,7 @@ Bind Group Search Filter|(member=uid={0},dc=example,dc=com)
 User Object Class|inetOrgPerson
 
 
-- A Multi-Master EMR Cluster
+**A Multi-Master EMR Cluster**
 
 Node|IP
 ---|---
@@ -151,7 +151,7 @@ Master Nodes|10.0.0.177,10.0.0.199,10.0.0.21
 Core Nodes|10.0.0.114,10.0.0.136
 
 
-- A Normal EMR Cluster
+**A Normal EMR Cluster**
 
 Node|IP
 ---|---
