@@ -6,7 +6,7 @@ Author：Laurence Geng　　｜　　Created Date：2020-11-21　　｜　　Upd
 
 ---
 
-This tool is used to install ranger and integrate with a AWS EMR cluster, and meanwhile integrate with a windows AD or Open LDAP server as authentication channel.
+This is a command line tool which is used to install ranger and integrate a AWS EMR cluster and a windows AD or Open LDAP server as authentication channel. There is another closely related project: **[ranger-emr-cfn-installer](https://github.com/bluishglc/ranger-emr-cfn-installer)** which does the same job via aws cloudformation. The two projects are very close, but can work independently，you can pick anyone as you wish.
 
 ## 1. Ranger Introduction
 
