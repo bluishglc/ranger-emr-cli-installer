@@ -193,6 +193,24 @@ sudo sh ranger-emr-cli-installer/bin/setup.sh install \
 --restart-interval 30
 ```
 
+This cli tool follows the principle of "convention over configuration", most parameters are preset by default values, so a simplified equivalent version of above command line is as following:
+
+```bash
+sudo sh ranger-emr-cli-installer/bin/setup.sh install \
+--auth-type ad \
+--ad-domain corp.emr.local \
+--ad-url ldap://10.0.0.194 \
+--ad-base-dn 'cn=users,dc=corp,dc=emr,dc=local' \
+--ad-bind-dn 'cn=ranger,ou=service accounts,dc=corp,dc=emr,dc=local' \
+--ad-bind-password 'Admin1234!' \
+--ad-user-object-class person \
+--ranger-plugins hdfs,hive,hbase \
+--emr-master-nodes 10.0.0.177,10.0.0.199,10.0.0.21 \
+--emr-core-nodes 10.0.0.114,10.0.0.136 \
+--emr-ssh-key /home/ec2-user/key.pem
+```
+
+
 ### 4.2. Integrate The Second Normal EMR Cluster
 
 The following diagram illustrates what this example will do:
@@ -246,6 +264,24 @@ sudo sh ranger-emr-cli-installer/bin/setup.sh install \
 --emr-core-nodes 10.0.0.114,10.0.0.136 \
 --emr-ssh-key /home/ec2-user/key.pem \
 --restart-interval 30
+```
+
+Again，a simplified equivalent version of above command line is as following:
+
+```bash
+sudo sh ranger-emr-cli-installer/bin/setup.sh install \
+--auth-type ldap \
+--ldap-url ldap://10.0.0.41 \
+--ldap-base-dn 'dc=example,dc=com' \
+--ldap-bind-dn 'cn=ranger,ou=service accounts,dc=example,dc=com' \
+--ldap-bind-password 'Admin1234!' \
+--ldap-user-dn-pattern 'uid={0},dc=example,dc=com' \
+--ldap-group-search-filter '(member=uid={0},dc=example,dc=com)' \
+--ldap-user-object-class inetOrgPerson \
+--ranger-plugins hdfs,hive,hbase \
+--emr-master-nodes 10.0.0.177,10.0.0.199,10.0.0.21 \
+--emr-core-nodes 10.0.0.114,10.0.0.136 \
+--emr-ssh-key /home/ec2-user/key.pem
 ```
 
 ## 5. Versions & Compatibility
