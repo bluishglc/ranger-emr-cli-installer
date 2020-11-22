@@ -36,7 +36,16 @@ So, a fully Ranger installation will cover following jobs:
 5. Install Ranger UserSync (and Integrate with AD/LDAP Server)
 6. Install Ranger Plugins (i.e. HDFS, Hive, HBase and so on)
 
-## 2. Download
+## 2. Prerequisites
+
+Before installing, make sure following items are ready or done:
+
+1. Make sure the EMR cluster is in waiting status, no any job is running
+2. Upload your private SSH key (the pem file) to ranger server, for example `/home/ec2-user/key.pem`
+3. It's recommanded to explore users and groups on Windows AD or Open LDAP via GUI tool, for example LDAP Admin, so as to detemine AD/LDAP related parameters
+4. Check network connectivities among Ranger server,  Windows AD or Open LDAP server and EMR nodes
+
+## 3. Download
 
 1. First of all, setup a clean linux server, login and switch to `root` user.
 
@@ -47,7 +56,7 @@ yum -y install git
 git clone https://github.com/bluishglc/ranger-emr-cli-installer.git /home/ec2-user/ranger-emr-cli-installer
 ```
 
-## 3. Usage
+## 4. Usage
 
 After download, let's print usage to check if the cli tool is ready to use:
 
@@ -116,7 +125,7 @@ Options:
 
 This means the tool is ready to use.
 
-## 4. Examples
+## 5. Examples
 
 To explain how to use this cli tool, assume we have following environment:
 
@@ -159,7 +168,7 @@ Node|IP
 Master Nodes|10.0.0.177,10.0.0.199,10.0.0.21
 Core Nodes|10.0.0.114,10.0.0.136
 
-### 4.1. Install Ranger + Integrate a Window AD Server + Integrate A Multi-Master EMR Cluster
+### 5.1. Install Ranger + Integrate a Window AD Server + Integrate A Multi-Master EMR Cluster
 
 The following diagram illustrates what this example will do:
 
@@ -211,7 +220,7 @@ sudo sh ranger-emr-cli-installer/bin/setup.sh install \
 ```
 
 
-### 4.2. Integrate The Second Normal EMR Cluster
+### 5.2. Integrate The Second Normal EMR Cluster
 
 The following diagram illustrates what this example will do:
 
@@ -231,7 +240,7 @@ sudo sh ranger-emr-cli-installer/bin/setup.sh install-ranger-plugins \
 --restart-interval 30
 ```
 
-### 4.3. Install Ranger + Integrate a Open LDAP Server + Integrate A Multi-Master EMR Cluster
+### 5.3. Install Ranger + Integrate a Open LDAP Server + Integrate A Multi-Master EMR Cluster
 
 The following diagram illustrates what this example will do:
 
@@ -284,7 +293,7 @@ sudo sh ranger-emr-cli-installer/bin/setup.sh install \
 --emr-ssh-key /home/ec2-user/key.pem
 ```
 
-## 5. Versions & Compatibility
+## 6. Versions & Compatibility
 
 The following is Ranger and EMR version compatibility form:
 
