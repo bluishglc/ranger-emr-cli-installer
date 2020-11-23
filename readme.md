@@ -68,7 +68,11 @@ if goes well, the console will print all actions and options supported by this C
 ```
 =============================    RANGER-EMR-CLI-INSTALLER USAGE    =============================
 
-Actions:
+SYNOPSIS
+
+./setup.sh [ACTION] [--OPTION1 VALUE1] [--OPTION2 VALUE2]...
+
+ACTIONS:
 
 install                               Install all components
 install-ranger                        Install ranger only
@@ -89,7 +93,7 @@ install-ranger-admin                  Install ranger admin
 install-ranger-usersync               Install ranger usersync
 help                                  Print help
 
-Options:
+OPTIONS:
 
 --auth-type [ad|ldap]                 Authentication type, optional value: ad or ldap
 --ad-domain                           Specify the domain name of windows ad server
@@ -131,9 +135,9 @@ To explain how to use this cli tool, assume we have following environment:
 
 **A Windows AD Server:**
 
-Info Item Key|Info Item Value
----------|-----
-IP|10.0.0.194
+Key|Value
+---------:|:-----
+&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; IP|10.0.0.194
 Domain Name|corp.emr.local
 Base DN|cn=users,dc=corp,dc=emr,dc=local
 Bind DN|cn=ranger,ou=service accounts,dc=example,dc=com
@@ -142,9 +146,9 @@ User Object Class|person
 
 **An Open LDAP Server:**
 
-Info Item Key|Info Item Value
----------|-----
-IP|10.0.0.41
+Key|Value
+---------:|:-----
+&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; IP|10.0.0.41
 Base DN|dc=example,dc=com
 Bind DN|cn=ranger,ou=service accounts,dc=example,dc=com
 Bind DN Password|Admin1234!
@@ -156,16 +160,16 @@ User Object Class|inetOrgPerson
 **A Multi-Master EMR Cluster:**
 
 Node|IP
----|---
-Master Nodes|10.0.0.177,10.0.0.199,10.0.0.21
+---:|:---
+&emsp;&emsp;&emsp;&emsp;&emsp;Master Nodes|10.0.0.177,10.0.0.199,10.0.0.21
 Core Nodes|10.0.0.114,10.0.0.136
 
 
 **A Normal EMR Cluster:**
 
 Node|IP
----|---
-Master Nodes|10.0.0.177,10.0.0.199,10.0.0.21
+---:|:---
+&emsp;&emsp;&emsp;&emsp;&emsp;Master Nodes|10.0.0.177,10.0.0.199,10.0.0.21
 Core Nodes|10.0.0.114,10.0.0.136
 
 ### 5.1. Install Ranger + Integrate a Window AD Server + Integrate A Multi-Master EMR Cluster
