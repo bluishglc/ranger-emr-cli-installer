@@ -70,7 +70,7 @@ if goes well, the console will print all actions and options supported by this C
 
 SYNOPSIS
 
-./setup.sh [ACTION] [--OPTION1 VALUE1] [--OPTION2 VALUE2]...
+sudo sh ranger-emr-cli-installer/bin/setup.sh [ACTION] [--OPTION1 VALUE1] [--OPTION2 VALUE2]...
 
 ACTIONS:
 
