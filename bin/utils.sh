@@ -122,10 +122,6 @@ parseArgs() {
                 RANGER_VERSION="$2"
                 shift 2
                 ;;
-            --ranger-repo-url)
-                RANGER_REPO_URL="$2"
-                shift 2
-                ;;
             --ranger-plugins)
                 IFS=', ' read -r -a RANGER_PLUGINS <<< "${2,,}"
                 shift 2
@@ -216,7 +212,6 @@ resetConfigs() {
     MYSQL_ROOT_PASSWORD=$DEFAULT_DB_PASSWORD
     MYSQL_RANGER_DB_USER_PASSWORD=$DEFAULT_DB_PASSWORD
     SOLR_HOST=$DEFAULT_HOSTNAME
-    RANGER_REPO_URL=$DEFAULT_RANGER_REPO_URL
     RANGER_VERSION=$DEFAULT_RANGER_VERSION
     RANGER_HOST=$DEFAULT_HOSTNAME
     RESTART_INTERVAL=$DEFAULT_RESTART_INTERVAL

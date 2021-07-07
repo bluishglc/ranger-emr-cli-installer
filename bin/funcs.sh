@@ -295,7 +295,9 @@ downloadRanger() {
     # repo dir plays a download flag file, if exists, skip download again.
     if [ ! -d /tmp/ranger-repo ]; then
         printHeading "DOWNLOAD RANGER"
-        wget --recursive --no-parent --no-directories --no-host-directories $RANGER_REPO_URL -P /tmp/ranger-repo
+        wget https://github.com/bluishglc/ranger-emr-cfn-installer/releases/download/v1.0/ranger-repo.tar.gz -O /tmp/ranger-repo.tar.gz
+        tar -zxvf /tmp/ranger-repo.tar.gz -C /tmp &>/dev/null
+        rm -rf /tmp/ranger-repo.tar.gz
     fi
 }
 
