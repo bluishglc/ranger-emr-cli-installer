@@ -6,6 +6,13 @@ Author：Laurence Geng　　｜　　Created Date：2020-11-21　　｜　　Upd
 
 ---
 
+Update@2021/07/07
+
+1. If EMR is based on Glue Data Catalog, Ranger still CAN work with it!
+2. By now, this solution works with all EMR 6.X (6.0.0 - 6.3.0)
+
+---
+
 This is a command line tool which is used to install ranger and integrate a AWS EMR cluster and a windows AD or Open LDAP server as authentication channel. There is another closely related project: **[ranger-emr-cfn-installer](https://github.com/bluishglc/ranger-emr-cfn-installer)** which does the same job via aws cloudformation. The two projects are very close, but can work independently，you can pick anyone as you wish.
 
 ## 1. Ranger Introduction
@@ -52,7 +59,7 @@ Before installing, make sure following items are ready or done:
 2. Install git and check out this project.
 
 ```bash
-yum -y install git
+sudo yum -y install git
 git clone https://github.com/bluishglc/ranger-emr-cli-installer.git /home/ec2-user/ranger-emr-cli-installer
 ```
 
