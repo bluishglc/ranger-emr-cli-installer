@@ -125,7 +125,6 @@ OPTIONS:
 --skip-install-solr [true|false]      Specify If skip solr installing or not, default value is 'false'
 --ranger-host                         Specify the ranger server hostname or IP, default value is current host IP
 --ranger-version [2.1.0]              Specify the ranger version, now only Ranger 2.1.0 is supported
---ranger-repo-url                     Specify the ranger repository url
 --ranger-plugins [hdfs|hive|hbase]    Specify what plugins will be installed(accept multiple comma-separated values), now support hdfs, hive and hbase
 --emr-master-nodes                    Specify master nodes list of EMR cluster(accept multiple comma-separated values), i.e. 10.0.0.1,10.0.0.2,10.0.0.3
 --emr-core-nodes                      Specify core nodes list of EMR cluster(accept multiple comma-separated values), i.e. 10.0.0.4,10.0.0.5,10.0.0.6
@@ -222,7 +221,6 @@ sudo sh ranger-emr-cli-installer/bin/setup.sh install \
 --ad-bind-password 'Admin1234!' \
 --ad-user-object-class person \
 --ranger-version 2.1.0 \
---ranger-repo-url 'http://52.81.173.97:7080/ranger-repo/' \
 --ranger-plugins hdfs,hive,hbase \
 --emr-master-nodes 10.0.0.177,10.0.0.199,10.0.0.21 \
 --emr-core-nodes 10.0.0.114,10.0.0.136 \
@@ -297,7 +295,6 @@ sudo sh ranger-emr-cli-installer/bin/setup.sh install \
 --ldap-group-search-filter '(member=uid={0},dc=example,dc=com)' \
 --ldap-user-object-class inetOrgPerson \
 --ranger-version 2.1.0 \
---ranger-repo-url 'http://52.81.173.97:7080/ranger-repo/' \
 --ranger-plugins hdfs,hive,hbase \
 --emr-master-nodes 10.0.0.177,10.0.0.199,10.0.0.21 \
 --emr-core-nodes 10.0.0.114,10.0.0.136 \
