@@ -50,6 +50,8 @@ installMySqlIfNotExists() {
             wget https://dev.mysql.com/get/mysql57-community-release-el7-11.noarch.rpm -P /tmp/
         fi
         rpm -ivh /tmp/mysql57-community-release-el7-11.noarch.rpm
+        # update gpg key, this is required after 2022
+        rpm --import https://repo.mysql.com/RPM-GPG-KEY-mysql-2022
         yum -y install mysql-community-server
         systemctl enable mysqld
         systemctl start mysqld
