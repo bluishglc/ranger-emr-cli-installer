@@ -1,0 +1,9 @@
+{
+  "name": "emrfs",
+  "description": "Create EMRFS Repo using CURL",
+  "type": "amazon-emr-emrfs",
+  "configs": {
+    "commonNameForCertificate": "@CERTIFICATE_CN@"
+  },
+  "isEnabled": true
+}

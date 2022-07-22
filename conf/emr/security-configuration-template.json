@@ -1,0 +1,48 @@
+{
+  "AuthenticationConfiguration": {
+    "KerberosConfiguration": {
+      "Provider": "ClusterDedicatedKdc",
+      "ClusterDedicatedKdcConfiguration": {
+        "TicketLifetimeInHours": 24,
+        "CrossRealmTrustConfiguration": {
+          "Realm": "@TRUSTING_REALM@",
+          "Domain": "@TRUSTING_DOMAIN@",
+          "AdminServer": "@TRUSTING_HOST@",
+          "KdcServer": "@TRUSTING_HOST@"
+        }
+      }
+    }
+  },
+  "AuthorizationConfiguration":{
+    "RangerConfiguration":{
+      "AdminServerURL":"@RANGER_URL@",
+      "RoleForRangerPluginsARN":"arn:@ARN_ROOT@:iam::@AWS_ACCOUNT_ID@:role/EMR_RANGER_PluginRole",
+      "RoleForOtherAWSServicesARN":"arn:@ARN_ROOT@:iam::@AWS_ACCOUNT_ID@:role/EMR_RANGER_OthersRole",
+      "AdminServerSecretARN":"@RANGER_ADMIN_SECRET_ARN@",
+      "RangerPluginConfigurations":[
+        {
+          "App":"Spark",
+          "ClientSecretARN":"@RANGER_PLUGIN_SECRET_ARN@",
+          "PolicyRepositoryName":"spark"
+        },
+        {
+          "App":"Hive",
+          "ClientSecretARN":"@RANGER_PLUGIN_SECRET_ARN@",
+          "PolicyRepositoryName":"hive"
+        },
+        {
+          "App":"EMRFS-S3",
+          "ClientSecretARN":"@RANGER_PLUGIN_SECRET_ARN@",
+          "PolicyRepositoryName":"emrfs"
+        }
+      ],
+      "AuditConfiguration":{
+        "Destinations":{
+          "AmazonCloudWatchLogs":{
+            "CloudWatchLogGroup":"@AUDIT_EVENTS_LOG_GROUP_ARN@"
+          }
+        }
+      }
+    }
+  }
+}

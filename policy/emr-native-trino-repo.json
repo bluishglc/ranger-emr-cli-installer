@@ -1,0 +1,13 @@
+{
+  "name": "trino",
+  "description": "Trino Repo",
+  "type": "amazon-emr-trino",
+  "configs": {
+    "username": "trino",
+    "password": "trino",
+    "jdbc.driverClassName": "io.trino.jdbc.TrinoDriver",
+    "jdbc.url": "jdbc:trino://localhost:port",
+    "commonNameForCertificate": "@CERTIFICATE_CN@"
+  },
+  "isEnabled": true
+}

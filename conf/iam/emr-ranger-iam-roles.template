@@ -1,0 +1,94 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: AWS CloudFormation template IAM Roles for Systems Manager | Automation Service
+
+Resources:
+  # Role for: < EC2 instance profile > when creating EMR cluster
+  EmrEc2RangerRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: EMR_EC2_RangerRole
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com.cn
+            Action:
+              - sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws-cn:iam::aws:policy/service-role/AmazonElasticMapReduceforEC2Role
+        - arn:aws-cn:iam::aws:policy/AmazonSSMManagedInstanceCore
+  # InstanceProfile linked to EmrEc2RangerRole
+  EmrEc2RangerProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      InstanceProfileName: EMR_EC2_RangerRole
+      Roles:
+        - !Ref 'EmrEc2RangerRole'
+  # Policy for: EmrEc2RangerRole, attach AssumeRole & TagSession permission for 2 roles
+  AllowAssumeOfRolesAndTaggingPolicy:
+    Type: 'AWS::IAM::Policy'
+    Properties:
+      PolicyName: AllowAssumeOfRolesAndTagging
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - sts:TagSession
+              - sts:AssumeRole
+            Resource:
+              - !GetAtt 'EmrRangerPluginRole.Arn'
+              - !GetAtt 'EmrRangerOthersRole.Arn'
+      Roles:
+        - !Ref 'EmrEc2RangerRole'
+  # Policy for: EmrEc2RangerRole, attach secrets read permission of secretsmanager
+  AllowSecretsRetrievalPolicy:
+    Type: 'AWS::IAM::Policy'
+    Properties:
+      PolicyName: AllowSecretsRetrieval
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - secretsmanager:GetSecretValue
+            Resource:
+              - !Join [ '', [ 'arn:aws-cn:secretsmanager:', !Ref "AWS::Region", ':', !Ref "AWS::AccountId", ':secret:', 'ranger-admin', '*' ] ]
+              - !Join [ '', [ 'arn:aws-cn:secretsmanager:', !Ref "AWS::Region", ':', !Ref "AWS::AccountId", ':secret:', 'ranger-plugin', '*' ] ]
+      Roles:
+        - !Ref 'EmrEc2RangerRole'
+  # Role for: < IAM role for Apache Ranger > when creating EMR Security Configuration
+  EmrRangerPluginRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: EMR_RANGER_PluginRole
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS:
+                - !GetAtt 'EmrEc2RangerRole.Arn'
+            Action:
+              - sts:AssumeRole
+              - sts:TagSession
+      ManagedPolicyArns:
+        - arn:aws-cn:iam::aws:policy/AmazonS3FullAccess
+        - arn:aws-cn:iam::aws:policy/CloudWatchFullAccess
+  # Role for: < IAM role for other Amazon Web Services > when creating EMR Security Configuration
+  EmrRangerOthersRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: EMR_RANGER_OthersRole
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS:
+                - !GetAtt 'EmrEc2RangerRole.Arn'
+            Action:
+              - sts:AssumeRole
+              - sts:TagSession

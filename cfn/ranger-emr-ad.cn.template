@@ -1,0 +1,273 @@
+Description: 'Install Ranger for EMR and integrate with Windows AD (For AWS China Regions)'
+Metadata:
+  AUTHOR: 'Laurence Geng'
+Parameters:
+  InstanceType:
+    Description: Ranger Server EC2 Instance Type
+    Type: String
+    Default: m5.xlarge
+    AllowedValues: [ t2.nano, t2.micro, t2.small, t2.medium, t2.large, t2.xlarge, t2.2xlarge,
+                     t3.nano, t3.micro, t3.small, t3.medium, t3.large, t3.xlarge, t3.2xlarge,
+                     m4.large, m4.xlarge, m4.2xlarge, m4.4xlarge, m4.10xlarge,
+                     m5.large, m5.xlarge, m5.2xlarge, m5.4xlarge,
+                     c5.large, c5.xlarge, c5.2xlarge, c5.4xlarge, c5.9xlarge,
+                     g3.8xlarge,
+                     r5.large, r5.xlarge, r5.2xlarge, r5.4xlarge, r3.12xlarge,
+                     i3.xlarge, i3.2xlarge, i3.4xlarge, i3.8xlarge,
+                     d2.xlarge, d2.2xlarge, d2.4xlarge, d2.8xlarge ]
+  EmrMasterSecurityGroupIds:
+    Description: "Security groups that can be used to access the EC2 instances"
+    Type: "List<AWS::EC2::SecurityGroup::Id>"
+    ConstraintDescription: "must be list of EC2 security group ids"
+  AccessCIDR:
+    AllowedPattern: '(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})/(\d{1,2})'
+    ConstraintDescription: must be a valid IP CIDR range of the form x.x.x.x/x.
+    Description: The IP address range that can be used to access to the EC2 instance
+    MaxLength: '18'
+    MinLength: '9'
+    Type: String
+  KeyName:
+    Description: Name of an existing EC2 KeyPair to enable SSH access to the instances
+    Type: AWS::EC2::KeyPair::KeyName
+    Default: id_rsa_aws
+    ConstraintDescription: Must be the name of an existing EC2 KeyPair.
+  SubnetId:
+    Description: The Public subnet where the ec2 instance will be launched
+    Type: AWS::EC2::Subnet::Id
+  VpcId:
+    Description: The VPC to launch the Ranger server
+    Type: AWS::EC2::VPC::Id
+  KeyFileS3Path:
+    Description: >-
+      The key file path of your private S3, the key file is the private ssh key which can login EMR nodes via SSH.
+    Type: String
+    AllowedPattern: '^/|//|(/[\w-]+)+(.pem)$'
+    ConstraintDescription: >-
+      Can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/), end with '.pem', for example: /my-bucket/my-key.pem
+  ImageId:
+    Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
+    Default: '/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2'
+  JavaHome:
+    Description: Path of Java Home
+    Type: String
+    Default: '/usr/lib/jvm/java'
+  SkipInstallMysql:
+    Description: Skip installing mysql or not, if yes, make sure there is an existing MySQL server is available to connect!
+    Type: String
+    Default: 'false'
+    AllowedValues:
+      - 'false'
+      - 'true'
+  RangerHost:
+    Description: >-
+      IP or Hostname of the Ranger Server ( EMR nodes will communicate with Ranger server via this hostname ).
+      If set 'localhost' or '127.0.0.1', it will be converted to private IP so as to be connected from external.
+    Type: String
+    Default: 'localhost'
+  MysqlHost:
+    Description: >-
+      IP or Hostname of the MySQL Server ( Ranger server will communicate with MySQL server via this hostname ).
+      If set 'localhost' or '127.0.0.1', it will be converted to private IP so as to be connected from external.
+    Type: String
+    Default: 'localhost'
+  MysqlRootPassword:
+    Description: Password of MySQL Server root user
+    Type: String
+    NoEcho: true
+  MysqlRangerDbUserPassword:
+    Description: Password of MySQL Server Ranger DB user
+    Type: String
+    NoEcho: true
+  SkipInstallSolr:
+    Description: Skip installing solr or not, if yes, make sure there is an existing Solr server is available to connect!
+    Type: String
+    Default: 'false'
+    AllowedValues:
+      - 'false'
+      - 'true'
+  SolrHost:
+    Description: >-
+      IP or Hostname of the Solr Server ( EMR nodes will communicate with Solr server via this hostname ).
+      If set 'localhost' or '127.0.0.1', it will be converted to private IP so as to be connected from external.
+    Type: String
+    Default: 'localhost'
+  AdUrl:
+    Description: URL of the Windows AD Server, i.e. ldap://10.0.0.1
+    Type: String
+  AdDomain:
+    Description: Domian Name of the Windows AD Server, i.e. example.com
+    Type: String
+  AdBaseDn:
+    Description: Base DN for Users, i.e. dc=example,dc=com
+    Type: String
+  AdRangerBindDn:
+    Description: Bind DN, i.e. cn=ranger-binder,ou=service accounts,dc=example,dc=com
+    Type: String
+  AdRangerBindPassword:
+    Description: Password of Bind DN
+    Type: String
+    NoEcho: true
+  AdUserObjectClass:
+    Description: objectClass of AD users, i.e. person
+    Type: String
+    Default: person
+  RangerVersion:
+    Description: Ranger version
+    Type: String
+    Default: '2.1.0'
+    AllowedValues:
+      - '2.1.0'
+  RangerRepoUrl:
+    Description: Url of Ranger installation packges repository
+    Type: String
+    Default: 'http://52.81.204.98:7080/ranger-repo/'
+  RangerPlugins:
+    Description: Ranger Plugins List to Be Installed (Used Commas to Sperate Multiple Plugins)
+    Type: String
+    Default: 'hdfs,hive,hbase'
+  EmrMasterNodes:
+    Description: Master Nodes' IP or Hostname List of EMR Cluster (Used Commas to Sperate Multiple Master Nodes)
+    Type: String
+  EmrCoreNodes:
+    Description: Core Nodes' IP or Hostname List of EMR Cluster (Used Commas to Sperate Multiple Core Nodes)
+    Type: String
+  RestartInterval:
+    Description: Interval time (seconds) when start and stop any service. Default value is 30 (seconds)
+    Type: String
+    AllowedPattern: '^\d+$'
+    Default: 30
+Resources:
+  IntanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: 'sts:AssumeRole'
+            Principal:
+              Service: ec2.amazonaws.com.cn
+            Effect: Allow
+            Sid: ''
+      Policies:
+        - PolicyDocument:
+            Statement:
+              - Action:
+                  - 's3:Get*'
+                  - 's3:List*'
+                Resource:
+                  - 'arn:aws-cn:s3:::*'
+                  - 'arn:aws-cn:s3:::*/*'
+                Effect: Allow
+          PolicyName: AuthenticatedS3GetObjects
+  InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: /
+      Roles:
+        - !Ref IntanceRole
+  InstanceSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: 'ssh access to instance'
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: !Ref AccessCIDR
+        - IpProtocol: tcp
+          FromPort: 6080
+          ToPort: 6080
+          CidrIp: !Ref AccessCIDR
+        - IpProtocol: tcp
+          FromPort: 8983
+          ToPort: 8983
+          CidrIp: !Ref AccessCIDR
+        - IpProtocol: tcp
+          FromPort: 3306
+          ToPort: 3306
+          CidrIp: !Ref AccessCIDR
+      VpcId: !Ref VpcId
+  Ec2Instance:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      IamInstanceProfile: !Ref InstanceProfile
+      ImageId: !Ref ImageId
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyName
+      SecurityGroupIds: !Split
+        - ','
+        - !Join
+          - ','
+          - - !GetAtt InstanceSecurityGroup.GroupId
+            - !Join
+              - ','
+              - !Ref EmrMasterSecurityGroupIds
+      SubnetId: !Ref SubnetId
+      UserData: !Base64
+          Fn::Sub:
+            |
+            #!/bin/bash
+            /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource Ec2Instance --region ${AWS::Region} --configsets Init
+            # sleep for a while so as instance initialing, otherwise, network or other resources may be not available
+            sleep 30
+            # Convert 'localhost' to IP, because EMR nodes will connect Ranger via the value of RangerHost
+            ResolvedRangerHost=$(if [ "${RangerHost}" = "localhost" -o "${RangerHost}" = "127.0.0.1" ]; then echo $(hostname -f); else echo ${RangerHost}; fi)
+            # Convert 'localhost' to IP, because EMR nodes will connect Solr via the value of SolrHost
+            ResolvedSolrHost=$(if [ "${SolrHost}" = "localhost" -o "${SolrHost}" = "127.0.0.1" ]; then echo $(hostname -f); else echo ${SolrHost}; fi)
+            # The same to SolrHost. although MySQL will not be connectted out of Ranger, but to keep consistent, we do so again.
+            ResolvedMysqlHost=$(if [ "${MysqlHost}" = "localhost" -o "${MysqlHost}" = "127.0.0.1" ]; then echo $(hostname -f); else echo ${MysqlHost}; fi)
+            wget http://52.81.204.98:7080/ranger-emr-cli-installer.zip -P /tmp/
+            unzip -o /tmp/ranger-emr-cli-installer.zip -d /home/ec2-user/
+            sh /home/ec2-user/ranger-emr-cli-installer/bin/setup.sh install \
+            --ranger-host $ResolvedRangerHost \
+            --java-home ${JavaHome} \
+            --skip-install-mysql ${SkipInstallMysql} \
+            --mysql-host $ResolvedMysqlHost \
+            --mysql-root-password '${MysqlRootPassword}' \
+            --mysql-ranger-db-user-password '${MysqlRangerDbUserPassword}' \
+            --skip-install-solr ${SkipInstallSolr} \
+            --solr-host $ResolvedSolrHost \
+            --auth-provider ad \
+            --ad-url ${AdUrl} \
+            --ad-domain ${AdDomain} \
+            --ad-base-dn '${AdBaseDn}' \
+            --ad-ranger-bind-dn '${AdRangerBindDn}' \
+            --ad-ranger-bind-password '${AdRangerBindPassword}' \
+            --ad-user-object-class '${AdUserObjectClass}' \
+            --ranger-version ${RangerVersion} \
+            --ranger-repo-url '${RangerRepoUrl}' \
+            --ranger-plugins ${RangerPlugins} \
+            --emr-master-nodes ${EmrMasterNodes} \
+            --emr-core-nodes ${EmrCoreNodes} \
+            --ssh-key /home/ec2-user/key.pem \
+            --restart-interval ${RestartInterval} &> /home/ec2-user/ranger-emr-cli-installer.log
+            /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource Ec2Instance --region ${AWS::Region}
+      Tags:
+        - Key: Name
+          Value: Ranger Server
+    Metadata:
+      AWS::CloudFormation::Authentication: 
+        S3AccessCreds:
+          type: S3
+          roleName:
+            Ref: IntanceRole
+      AWS::CloudFormation::Init:
+        configSets:
+          Init:
+            - GetKeyFile
+        GetKeyFile:
+          files:
+            /home/ec2-user/key.pem:
+              source: !Sub
+                - >-
+                  https://s3.${AWS::Region}.amazonaws.com.cn${KeyFileS3Path}
+                - KeyFileS3Path: !Ref KeyFileS3Path
+              mode: '000600'
+              authentication: S3AccessCreds
+    CreationPolicy:
+      ResourceSignal:
+        Count: 1
+        Timeout: PT60M
+Outputs:
+  PublicIP:
+    Description: IP address of the newly created EC2 instance
+    Value: !GetAtt [Ec2Instance, PublicIp]

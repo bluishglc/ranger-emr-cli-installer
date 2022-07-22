@@ -1,0 +1,83 @@
+[
+  {
+    "InstanceGroupId": "@MASTER_INSTANCE_GROUP_ID@",
+    "Configurations": [
+      {
+        "Classification": "hue-ini",
+        "Properties": {},
+        "Configurations": [
+          {
+            "Classification": "desktop",
+            "Properties": {},
+            "Configurations": [
+              {
+                "Classification": "ldap",
+                "Properties": {},
+                "Configurations": [
+                  {
+                    "Classification": "ldap_servers",
+                    "Properties": {},
+                    "Configurations": [
+                      {
+                        "Classification": "@ORG_NAME@",
+                        "Properties": {
+                          "ldap_url": "ldap://@OPENLDAP_HOST@",
+                          "base_dn": "@OPENLDAP_BASE_DN@",
+                          "bind_dn": "@OPENLDAP_HUE_BIND_DN@",
+                          "bind_password": "@OPENLDAP_HUE_BIND_PASSWORD@",
+                          "search_bind_authentication": "true",
+                          "create_users_on_login": "false"
+                        },
+                        "Configurations": [
+                          {
+                            "Classification": "users",
+                            "Properties": {
+                              "user_filter": "objectclass=@OPENLDAP_USER_OBJECT_CLASS@",
+                              "user_name_attr": "uid"
+                            },
+                            "Configurations": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "Classification": "auth",
+                "Properties": {
+                  "backend": "desktop.auth.backend.AllowFirstUserDjangoBackend,desktop.auth.backend.LdapBackend"
+                },
+                "Configurations": []
+              }
+            ]
+          },
+          {
+            "Classification": "hadoop",
+            "Properties": {},
+            "Configurations": [
+              {
+                "Classification": "hdfs_clusters",
+                "Properties": {},
+                "Configurations": [
+                  {
+                    "Classification": "default",
+                    "Properties": {
+                      "webhdfs_url": "http://@MASTER_PRIVATE_FQDN@:9870/webhdfs/v1"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "Classification": "spark",
+            "Properties": {
+              "sql_server_host": "@MASTER_PRIVATE_FQDN@"
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

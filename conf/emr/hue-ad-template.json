@@ -1,0 +1,63 @@
+[
+  {
+    "InstanceGroupId": "@MASTER_INSTANCE_GROUP_ID@",
+    "Configurations": [
+      {
+        "Classification": "hue-ini",
+        "Properties": {},
+        "Configurations": [
+          {
+            "Classification": "desktop",
+            "Properties": {},
+            "Configurations": [
+              {
+                "Classification": "ldap",
+                "Properties": {
+                  "ldap_url": "@AD_URL@",
+                  "nt_domain": "@AD_DOMAIN@",
+                  "bind_dn": "@AD_RANGER_BIND_DN@",
+                  "search_bind_authentication": "true",
+                  "create_users_on_login": "false",
+                  "use_start_tls": "false",
+                  "base_dn": "@AD_BASE_DN@",
+                  "bind_password": "@AD_RANGER_BIND_PASSWORD@"
+                }
+              },
+              {
+                "Classification": "auth",
+                "Properties": {
+                  "backend": "desktop.auth.backend.AllowFirstUserDjangoBackend,desktop.auth.backend.LdapBackend"
+                },
+                "Configurations": []
+              }
+            ]
+          },
+          {
+            "Classification": "hadoop",
+            "Properties": {},
+            "Configurations": [
+              {
+                "Classification": "hdfs_clusters",
+                "Properties": {},
+                "Configurations": [
+                  {
+                    "Classification": "default",
+                    "Properties": {
+                      "webhdfs_url": "http://@MASTER_PRIVATE_FQDN@:9870/webhdfs/v1"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "Classification": "spark",
+            "Properties": {
+              "sql_server_host": "@MASTER_PRIVATE_FQDN@"
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

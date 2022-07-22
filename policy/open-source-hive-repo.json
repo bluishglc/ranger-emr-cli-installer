@@ -7,7 +7,7 @@
    \"username\": \"hive\",
    \"password\": \"hive\",
    \"jdbc.driverClassName\": \"org.apache.hive.jdbc.HiveDriver\",
-   \"jdbc.url\": \"jdbc:hive2://@EMR_HIVE_SERVER2@:10000/default\",
+   \"jdbc.url\": \"jdbc:hive2://@EMR_FIRST_MASTER_NODE@:10000/default\",
    \"commonNameForCertificate\": \"\"
  }"
 }

@@ -1,0 +1,9 @@
+{
+  "name": "spark",
+  "description": "Spark Repo",
+  "type": "amazon-emr-spark",
+  "configs": {
+    "commonNameForCertificate": "@CERTIFICATE_CN@"
+  },
+  "isEnabled": true
+}
