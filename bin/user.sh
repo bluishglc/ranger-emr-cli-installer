@@ -6,6 +6,19 @@
 addExampleUsers() {
     printHeading "ADD EXAMPLE USER"
     testKerberosKdcConnectivity
+
+    distributeInstaller "ec2-user" "$OPENLDAP_HOST"
+    ssh -o StrictHostKeyChecking=no -i $SSH_KEY -T ec2-user@$OPENLDAP_HOST \
+        sudo sh $APP_REMOTE_HOME/bin/setup.sh add-example-users-on-openldap-local \
+        --region $REGION \
+        --solution $SOLUTION \
+        --auth-provider $AUTH_PROVIDER \
+        --openldap-host $OPENLDAP_HOST \
+        --openldap-base-dn $OPENLDAP_BASE_DN \
+        --openldap-root-cn $OPENLDAP_ROOT_CN \
+        --openldap-root-password $OPENLDAP_ROOT_PASSWORD \
+        --example-users "$(echo ${EXAMPLE_USERS[*]} | sed -E 's/[[:blank:]]+/,/g')"
+
     distributeInstaller "hadoop" "$KERBEROS_KDC_HOST"
     ssh -o StrictHostKeyChecking=no -i $SSH_KEY -T hadoop@$KERBEROS_KDC_HOST \
         sudo sh $APP_REMOTE_HOME/bin/setup.sh add-example-users-on-kdc-local \
@@ -17,6 +30,7 @@ addExampleUsers() {
         --openldap-root-cn $OPENLDAP_ROOT_CN \
         --openldap-root-password $OPENLDAP_ROOT_PASSWORD \
         --example-users "$(echo ${EXAMPLE_USERS[*]} | sed -E 's/[[:blank:]]+/,/g')"
+
     # manually sync example user to ranger by restart ranger-usersync service
     # otherwise, ranger-usersync auto sync from ad/ldap every 360 minutes.
     # tips, this command should run on ranger server.
@@ -24,16 +38,19 @@ addExampleUsers() {
 }
 
 addExampleUsersOnKdcLocal() {
-    if [[ "$AUTH_PROVIDER" = "openldap" ]]; then
-        addOpenldapUsers
-        if [[ "$SOLUTION" = "emr-native" ]]; then
-            addKerberosUsers
-            updateOpenldapUsersPasswordSetting
-        fi
+    if [[ "$AUTH_PROVIDER" = "openldap" && "$SOLUTION" = "emr-native" ]]; then
+        addKerberosUsers
     else
         echo "Nothing to do!"
         echo "add-example-users is a utility cli action, it ONLY works for openldap + open-source ranger or openldap + emr-native ranger solution!"
         echo "For Windows AD bases solution, please go to Windows AD server to create users!"
+    fi
+}
+
+addExampleUsersOnOpenldapLocal() {
+    if [[ "$AUTH_PROVIDER" = "openldap" ]]; then
+        addOpenldapUsers
+        updateOpenldapUsersPasswordSetting
     fi
 }
 
@@ -78,18 +95,36 @@ EOF
 }
 
 addKerberosUsers() {
-    for user in "${EXAMPLE_USERS[@]}"; do
-        /usr/bin/expect <<EOF
-            spawn kadmin.local -q "addprinc -x dn=uid=$user,$OPENLDAP_USERS_BASE_DN $user"
-            expect {
-                "Enter password*" {
-                    send "$COMMON_DEFAULT_PASSWORD\r"
-                    expect "Re-enter password*" { send "$COMMON_DEFAULT_PASSWORD\r" }
+    # install expect in case not installed
+    yum -y install expect
+    # if kerberos db is migrated to openldap, -x parameter would be required
+    if [ -f "$MIGRATE_KERBEROS_DB_FLAG" ]; then
+       for user in "${EXAMPLE_USERS[@]}"; do
+            /usr/bin/expect <<EOF
+                spawn kadmin.local -q "addprinc -x dn=uid=$user,$OPENLDAP_USERS_BASE_DN $user"
+                expect {
+                    "Enter password*" {
+                        send "$COMMON_DEFAULT_PASSWORD\r"
+                        expect "Re-enter password*" { send "$COMMON_DEFAULT_PASSWORD\r" }
+                    }
                 }
-            }
-            expect eof
+                expect eof
 EOF
-    done
+        done
+    else
+       for user in "${EXAMPLE_USERS[@]}"; do
+            /usr/bin/expect <<EOF
+                spawn kadmin.local -q "addprinc $user"
+                expect {
+                    "Enter password*" {
+                        send "$COMMON_DEFAULT_PASSWORD\r"
+                        expect "Re-enter password*" { send "$COMMON_DEFAULT_PASSWORD\r" }
+                    }
+                }
+                expect eof
+EOF
+        done
+    fi
 }
 
 updateOpenldapUsersPasswordSetting() {

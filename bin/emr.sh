@@ -105,7 +105,6 @@ updateHueConfiguration() {
         echo "Invalid authentication type, only AD and LDAP are supported!"
         exit 1
     fi
-
     aws emr modify-instance-groups --cluster-id $EMR_CLUSTER_ID \
         --instance-groups file://$confFile
 }

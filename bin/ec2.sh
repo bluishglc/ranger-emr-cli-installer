@@ -3,7 +3,7 @@
 initEc2() {
     # init ec2 is a one-time job, no need to run duplicatly,
     # especially when re-run all-in-one install
-    if [ -f $INIT_EC2_FLAG_FILE ]; then
+    if [ -f "$INIT_EC2_FLAG_FILE" ]; then
         echo "This ec2 instance has been initialized, nothing to do!"
         echo "If you want to force re-init this ec2, please execute force-init-ec2 command"
     else
@@ -15,12 +15,12 @@ initEc2() {
         configSsh
         installAwsCli
         installJdk8IfNotExists
-        touch $INIT_EC2_FLAG_FILE
+        touch "$INIT_EC2_FLAG_FILE"
     fi
 }
 
 forceInitEc2() {
-    rm -f $INIT_EC2_FLAG_FILE
+    rm -f "$INIT_EC2_FLAG_FILE"
     initEc2
 }
 

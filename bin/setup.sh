@@ -16,16 +16,15 @@ export APP_REMOTE_HOME="/opt/ranger-emr-cli-installer"
 export AWS_PAGER=""
 
 OPT_KEYS=(
-    REGION ARN_ROOT ACCESS_KEY_ID SECRET_ACCESS_KEY SOLUTION ENABLE_CROSS_REALM_TRUST TRUSTING_REALM TRUSTING_DOMAIN TRUSTING_HOST RANGER_SECRETS_DIR
+    REGION ARN_ROOT SSH_KEY ACCESS_KEY_ID SECRET_ACCESS_KEY SOLUTION ENABLE_CROSS_REALM_TRUST TRUSTING_REALM TRUSTING_DOMAIN TRUSTING_HOST RANGER_SECRETS_DIR
     AUTH_PROVIDER AD_DOMAIN AD_URL AD_BASE_DN AD_RANGER_BIND_DN AD_RANGER_BIND_PASSWORD AD_HUE_BIND_DN AD_HUE_BIND_PASSWORD AD_USER_OBJECT_CLASS
     SKIP_INSTALL_OPENLDAP OPENLDAP_URL OPENLDAP_USER_DN_PATTERN OPENLDAP_GROUP_SEARCH_FILTER OPENLDAP_BASE_DN OPENLDAP_RANGER_BIND_DN OPENLDAP_RANGER_BIND_PASSWORD OPENLDAP_HUE_BIND_DN OPENLDAP_HUE_BIND_PASSWORD OPENLDAP_USER_OBJECT_CLASS
     OPENLDAP_BASE_DN OPENLDAP_ROOT_CN OPENLDAP_ROOT_PASSWORD OPENLDAP_USERS_BASE_DN
     JAVA_HOME SKIP_INSTALL_MYSQL MYSQL_HOST MYSQL_ROOT_PASSWORD MYSQL_RANGER_DB_USER_PASSWORD
     SKIP_INSTALL_SOLR SOLR_HOST RANGER_HOST RANGER_PORT RANGER_REPO_URL RANGER_VERSION RANGER_PLUGINS
-    KERBEROS_KDC_HOST OPENLDAP_HOST
-    EMR_CLUSTER_ID MASTER_INSTANCE_GROUP_ID SLAVE_INSTANCE_GROUP_IDS EMR_MASTER_NODES EMR_SLAVE_NODES EMR_CLUSTER_NODES
-    EMR_ZK_QUORUM EMR_HDFS_URL EMR_FIRST_MASTER_NODE
-    SSH_KEY EXAMPLE_GROUP EXAMPLE_USERS RESTART_INTERVAL
+    KERBEROS_KDC_HOST SKIP_MIGRATE_KERBEROS_DB OPENLDAP_HOST
+    EMR_CLUSTER_ID MASTER_INSTANCE_GROUP_ID SLAVE_INSTANCE_GROUP_IDS EMR_MASTER_NODES EMR_SLAVE_NODES EMR_CLUSTER_NODES EMR_ZK_QUORUM EMR_HDFS_URL EMR_FIRST_MASTER_NODE
+    EXAMPLE_GROUP EXAMPLE_USERS SKIP_CONFIGURE_HUE RESTART_INTERVAL
 )
 
 source "$APP_HOME/bin/utils.sh"
@@ -68,6 +67,18 @@ install() {
         waitForCreatingEmrCluster
     fi
 
+    # for OpenLDAP + EMR Native Ranger solution, need enable sasl/gssapi and migrate kerberos db
+    if [[ "$AUTH_PROVIDER" = "openldap" && "$SOLUTION" = "emr-native" ]]; then
+        if [[ "$SKIP_MIGRATE_KERBEROS_DB" = "false" ]]; then
+            # BE CAREFUL!!
+            # the puppet of EMR will always revert changes of kdc.conf
+            # so will disable migrating kerberos db job, this does NOT block other functions.
+            # but, please remeber to remove -x parameter of addprinc when creating kerberos principal!
+            migrateKerberosDb
+        fi
+        enableSaslGssapi
+    fi
+
     # if AUTH_PROVIDER is openldap and SOLUTION is open-source,
     # an EMR cluster should be available, the EMR_CLUSTER_ID is provided,
     # so it is time to install sssd on each node of EMR cluster.
@@ -79,25 +90,22 @@ install() {
         installSssd
     fi
 
-    # for OpenLDAP + EMR Native Ranger solution, need enable sasl/gssapi and migrate kerberos db
-    if [[ "$AUTH_PROVIDER" = "openldap" && "$SOLUTION" = "emr-native" ]]; then
-        # BE CAREFUL!!
-        # the puppet of EMR will always revert changes of kdc.conf
-        # so will disable migrating kerberos db job, this does NOT block other functions.
-        # but, please remeber to remove -x parameter of addprinc when creating kerberos principal!
-        migrateKerberosDb
-        enableSaslGssapi
-    fi
+#    # updating hue configuration also need an EMR cluster is ready,
+#    # so only open-source can do now, for emr-native, need  defer to EMR cluster is up.
+#    if [ "$SOLUTION" = "open-source" ]; then
 
+    # Because emr configuration is an all-in-one json, so be careful to perform
+    # updating hue configuration action unless your emr cluster's configuration is empty.
+    # by default, we will update it to achieve completed installation, if you have other
+    # configurations, please set "--skip-configure-hue true".
+    if [ "$SKIP_CONFIGURE_HUE" = "false" ]; then
+        updateHueConfiguration
+    fi
+#    fi
     # add example users if --example-users provided
     if [[ "$AUTH_PROVIDER" = "openldap" && "${EXAMPLE_USERS[*]}" != "" ]]; then
         addExampleUsers
     fi
-#    # updating hue configuration also need an EMR cluster is ready,
-#    # so only open-source can do now, for emr-native, need  defer to EMR cluster is up.
-#    if [ "$SOLUTION" = "open-source" ]; then
-    updateHueConfiguration
-#    fi
     printHeading "ALL DONE!!"
 }
 
@@ -267,15 +275,15 @@ parseArgs() {
     resetAllOpts
 
     optString="\
-        region:,access-key-id:,secret-access-key:,java-home:,\
-        kerberos-realm:,kerberos-kdc-host:,kerberos-kadmin-password:,\
+        region:,ssh-key:,access-key-id:,secret-access-key:,java-home:,\
+        skip-migrate-kerberos-db:,kerberos-realm:,kerberos-kdc-host:,kerberos-kadmin-password:,\
         solution:,enable-cross-realm-trust:,trusting-realm:,trusting-domain:,trusting-host:,ranger-version:,ranger-repo-url:,restart-interval:,ranger-host:,ranger-secrets-dir:,ranger-plugins:,\
         auth-provider:,ad-domain:,ad-base-dn:,ad-ranger-bind-dn:,ad-ranger-bind-password:,ad-hue-dn:,ad-hue-password:,ad-user-object-class:,\
         openldap-host:,openldap-base-dn:,openldap-root-cn:,openldap-root-password:,example-users:,\
         sssd-bind-dn:,sssd-bind-dn-password:,\
         skip-install-openldap:,openldap-user-dn-pattern:,openldap-group-search-filter:,openldap-base-dn:,openldap-ranger-bind-dn:,openldap-ranger-bind-password:,openldap-hue-bind-dn:,openldap-hue-bind-password:,openldap-user-object-class:,\
-        skip-install-mysql:,mysql-host:,mysql-root-password:,mysql-ranger-db-user-password:,\
-        skip-install-solr:,solr-host:,emr-master-nodes:,emr-core-nodes:,ssh-key:,emr-cluster-id:\
+        skip-install-mysql:,mysql-host:,mysql-root-password:,mysql-ranger-db-user-password:,skip-install-solr:,solr-host:,\
+        emr-cluster-id:,skip-configure-hue:\
     "
     # IMPORTANT!! -o option can not be omitted, even there are no any short options!
     # otherwise, parsing will go wrong!
@@ -338,6 +346,14 @@ parseArgs() {
                 ;;
             --auth-provider)
                 AUTH_PROVIDER="${2,,}"
+                shift 2
+                ;;
+            --skip-migrate-kerberos-db)
+                if [ "$2" != "true" -a "$2" != "false" ]; then
+                    echo "For --skip-migrate-kerberos-db option, only 'true' or 'false' is acceptable!"
+                    exit 1
+                fi
+                SKIP_MIGRATE_KERBEROS_DB="$2"
                 shift 2
                 ;;
             --kerberos-realm)
@@ -553,6 +569,14 @@ parseArgs() {
                 SSSD_BIND_DN_PASSWORD="$2"
                 shift 2
                 ;;
+            --skip-configure-hue)
+                if [ "$2" != "true" -a "$2" != "false" ]; then
+                    echo "For --skip-configure-hue option, only 'true' or 'false' is acceptable!"
+                    exit 1
+                fi
+                SKIP_CONFIGURE_HUE="$2"
+                shift 2
+                ;;
             --example-users)
                 IFS=', ' read -r -a EXAMPLE_USERS <<< "${2,,}"
                 shift 2
@@ -623,6 +647,7 @@ resetAllOpts() {
     done
     # Set default value for some configs if there are not set in command line.
     INIT_EC2_FLAG_FILE='/tmp/init-ec2.flag'
+    MIGRATE_KERBEROS_DB_FLAG='/tmp/migrate-kerberos-db.flag'
     JAVA_HOME='/usr/lib/jvm/java'
     COMMON_DEFAULT_PASSWORD='Admin1234!'
     RANGER_VERSION='2.1.0'
@@ -640,6 +665,8 @@ resetAllOpts() {
     SKIP_INSTALL_MYSQL=false
     SKIP_INSTALL_SOLR=false
     SKIP_INSTALL_OPENLDAP=false
+    SKIP_CONFIGURE_HUE=false
+    SKIP_MIGRATE_KERBEROS_DB=false
     OPENLDAP_BASE_DN='dc=example,dc=com'
     OPENLDAP_ROOT_CN='admin'
     OPENLDAP_ROOT_PASSWORD=$COMMON_DEFAULT_PASSWORD
@@ -923,7 +950,7 @@ case $ACTION in
     print-emr-cluster-nodes)
         printEmrClusterNodes
     ;;
-   find-emr-log-errors)
+    find-emr-log-errors)
         findLogErrors
     ;;
 
@@ -972,6 +999,9 @@ case $ACTION in
     ;;
     add-example-users-on-kdc-local)
         addExampleUsersOnKdcLocal
+    ;;
+    add-example-users-on-openldap-local)
+        addExampleUsersOnOpenldapLocal
     ;;
     help)
 #        printUsage

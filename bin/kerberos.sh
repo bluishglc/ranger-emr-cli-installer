@@ -5,17 +5,23 @@
 # be careful, migrating kerberos db is ONE-TIME operation,
 # it can NOT run twice!
 migrateKerberosDb() {
-    testKerberosKdcConnectivity
-    distributeInstaller "hadoop" "$KERBEROS_KDC_HOST"
-    ssh -o StrictHostKeyChecking=no -i $SSH_KEY -T hadoop@$KERBEROS_KDC_HOST \
-        sudo sh $APP_REMOTE_HOME/bin/setup.sh migrate-kerberos-db-on-kdc-local \
-        --region $REGION \
-        --kerberos-realm $KERBEROS_REALM \
-        --kerberos-kdc-host $KERBEROS_KDC_HOST \
-        --openldap-host $OPENLDAP_HOST \
-        --openldap-base-dn $OPENLDAP_BASE_DN \
-        --openldap-root-cn $OPENLDAP_ROOT_CN \
-        --openldap-root-password $OPENLDAP_ROOT_PASSWORD
+    # similar to init-ec2, migrating kerberos db is also a one-time job
+    if [ -f "$MIGRATE_KERBEROS_DB_FLAG" ]; then
+        echo "You have already migrated kerberos db to OpenLDAP, this is one-time job, can't rerun!"
+    else
+        testKerberosKdcConnectivity
+        distributeInstaller "hadoop" "$KERBEROS_KDC_HOST"
+        ssh -o StrictHostKeyChecking=no -i $SSH_KEY -T hadoop@$KERBEROS_KDC_HOST \
+            sudo sh $APP_REMOTE_HOME/bin/setup.sh migrate-kerberos-db-on-kdc-local \
+            --region $REGION \
+            --kerberos-realm $KERBEROS_REALM \
+            --kerberos-kdc-host $KERBEROS_KDC_HOST \
+            --openldap-host $OPENLDAP_HOST \
+            --openldap-base-dn $OPENLDAP_BASE_DN \
+            --openldap-root-cn $OPENLDAP_ROOT_CN \
+            --openldap-root-password $OPENLDAP_ROOT_PASSWORD
+        touch "$MIGRATE_KERBEROS_DB_FLAG"
+    fi
 }
 
 migrateKerberosDbOnKdcLocal() {
