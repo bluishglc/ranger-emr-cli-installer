@@ -6,6 +6,9 @@ Author：Laurence Geng　　｜　　Created Date：2020-11-21　　｜　　Upd
 
 ---
 
+## The documents for brand-new version 2.0 is coming soon...
+
+
 Update@2021/07/07
 
 1. If EMR is based on Glue Data Catalog, Ranger still CAN work with it!
