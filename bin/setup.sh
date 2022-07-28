@@ -69,6 +69,7 @@ install() {
 
     # for OpenLDAP + EMR Native Ranger solution, need enable sasl/gssapi and migrate kerberos db
     if [[ "$AUTH_PROVIDER" = "openldap" && "$SOLUTION" = "emr-native" ]]; then
+        enableSaslGssapi
         if [[ "$SKIP_MIGRATE_KERBEROS_DB" = "false" ]]; then
             # BE CAREFUL!!
             # the puppet of EMR will always revert changes of kdc.conf
@@ -76,7 +77,6 @@ install() {
             # but, please remeber to remove -x parameter of addprinc when creating kerberos principal!
             migrateKerberosDb
         fi
-        enableSaslGssapi
     fi
 
     # if AUTH_PROVIDER is openldap and SOLUTION is open-source,
@@ -316,8 +316,10 @@ parseArgs() {
                 # 2. for others, arn root is aws
                 if [ "$REGION" = "cn-north-1" -o "$REGION" = "cn-northwest-1" ]; then
                     ARN_ROOT="aws-cn"
+                    SERVICE_POSTFIX="com.cn"
                 else
                     ARN_ROOT="aws"
+                    SERVICE_POSTFIX="com"
                 fi
                 shift 2
                 ;;
