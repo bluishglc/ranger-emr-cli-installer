@@ -55,8 +55,8 @@ Resources:
             Action:
               - secretsmanager:GetSecretValue
             Resource:
-              - !Join [ '', [ 'arn:@ARN_ROOT@:secretsmanager:', !Ref "AWS::Region", ':', !Ref "AWS::AccountId", ':secret:', 'ranger-admin', '*' ] ]
-              - !Join [ '', [ 'arn:@ARN_ROOT@:secretsmanager:', !Ref "AWS::Region", ':', !Ref "AWS::AccountId", ':secret:', 'ranger-plugin', '*' ] ]
+              - !Join [ '', [ 'arn:@ARN_ROOT@:secretsmanager:', '*', ':', !Ref "AWS::AccountId", ':secret:', 'ranger-admin', '*' ] ]
+              - !Join [ '', [ 'arn:@ARN_ROOT@:secretsmanager:', '*', ':', !Ref "AWS::AccountId", ':secret:', 'ranger-plugin', '*' ] ]
       Roles:
         - !Ref 'EmrEc2RangerRole'
   # Role for: < IAM role for Apache Ranger > when creating EMR Security Configuration

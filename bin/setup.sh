@@ -146,7 +146,7 @@ waitForCreatingEmrCluster() {
         echo -ne "\n>> Accepted the emr cluster kerberos kadmin password: \E[33m[ $KERBEROS_KADMIN_PASSWORD ]\E[0m\n\n"
 
         read -p "5. Enter the private DNS (FQDN) of emr cluster kerberos kdc host: " KERBEROS_KDC_HOST
-        echo -ne "\n>> Accepted the private DNS (FQDN) of emr cluster kerberos kdc host: : \E[33m[ $KERBEROS_KDC_HOST ]\E[0m\n\n"
+        echo -ne "\n>> Accepted the private DNS (FQDN) of emr cluster kerberos kdc host: \E[33m[ $KERBEROS_KDC_HOST ]\E[0m\n\n"
 
         answered="false"
         while [[ $answered != "true" ]]; do
@@ -309,7 +309,7 @@ parseArgs() {
                     # SSL: certificate subject name '*.compute.internal' does not match target host name 'ip-x-x-x-x.cn-north-1.compute.internal'
                     # I don't know why emr native plugin can work with cn "*.compute.internal", it seems emr native does NOT sync policies via https.
                     # BUT for opensource plugins, "*.compute.internal"??? testing!!!
-#                    CERTIFICATE_CN="*.${REGION}.compute.internal"
+                    # CERTIFICATE_CN="*.${REGION}.compute.internal"
                     CERTIFICATE_CN="*.compute.internal"
                 fi
                 # 1. for china, arn root is aws-cn
