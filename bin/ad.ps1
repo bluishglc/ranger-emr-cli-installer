@@ -1,14 +1,16 @@
-# 安装Active Directory服务
+# install Active Directory
 Install-windowsfeature -name AD-Domain-Services -IncludeManagementTools
 
-# 创建Forest, 命令执行成功之后会自动重启服务器，虽然使用-NoRebootOnCompletion:$true可以规避自动重启，但是如果要正常使用AD服务，还是要重启服务器。
+# create forest, this command require reboot, although -NoRebootOnCompletion:$true can help skip reboot
+# however, it is still needed for AD to reboot anyway.
 Install-ADDSForest -DomainName example.com -SafeModeAdministratorPassword (ConvertTo-SecureString 'Admin1234!' -AsPlainText -Force) -DomainMode WinThreshold -DomainNetbiosName ABC -ForestMode WinThreshold -DatabasePath "C:\Windows\NTDS" -LogPath "C:\Windows\NTDS" -SysvolPath "C:\Windows\SYSVOL" -CreateDnsDelegation:$false -InstallDns:$true -NoRebootOnCompletion:$false -Force:$true
 
 ksetup /addkdc CN-NORTH-1.COMPUTE.INTERNAL
 
 netdom trust CN-NORTH-1.COMPUTE.INTERNAL /Domain:EXAMPLE.COM /add /realm /passwordt:Admin1234!
 
-# 执行该命令前，需在AD服务上手都配置安全组策略, 确保“Kerberos允许的加密类型”这一配置项包含如下两种加密类型中的一种或全部！
+# need config "encrypt types for Kerberos" on AD (it seems UI only),
+# add one or both following items:
 ksetup /SetEncTypeAttr CN-NORTH-1.COMPUTE.INTERNAL AES256-CTS-HMAC-SHA1-96 AES128-CTS-HMAC-SHA1-96
 
 # ------------------------------------------   ou: Service Accounts   ------------------------------------------- #
