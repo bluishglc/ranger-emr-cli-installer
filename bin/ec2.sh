@@ -1,12 +1,15 @@
 #!/bin/bash
 
 initEc2() {
-    # init ec2 is a one-time job, no need to run duplicatly,
-    # especially when re-run all-in-one install
-    if [ -f "$INIT_EC2_FLAG_FILE" ]; then
-        echo "This ec2 instance has been initialized, nothing to do!"
-        echo "If you want to force re-init this ec2, please execute force-init-ec2 command"
-    else
+    # In most cases, init ec2 is a one-time job, no need to run duplicatly,
+    # however, sometimes, when first run, users may enter wrong region or access keys,
+    # then all following actions will fail, and this is hard to find root cause,
+    # so finally, let's remove installed flag checking, let init-ec2 job always run!
+
+#    if [ -f "$INIT_EC2_FLAG_FILE" ]; then
+#        echo "This ec2 instance has been initialized, nothing to do!"
+#        echo "If you want to force re-init this ec2, please execute force-init-ec2 command"
+#    else
         if [[ "$REGION" = "" || "$ACCESS_KEY_ID" = "" || "$SECRET_ACCESS_KEY" = "" ]]; then
             echo "ERROR! --region or --access-key-id or --secret-access-key is not provided!"
             exit 1
@@ -16,7 +19,7 @@ initEc2() {
         installAwsCli
         installJdk8IfNotExists
         touch "$INIT_EC2_FLAG_FILE"
-    fi
+#    fi
 }
 
 forceInitEc2() {
@@ -67,11 +70,11 @@ installAwsCli() {
     yum -y remove awscli
 
     echo "Remove awscli v2 if exists in case not latest version ..."
-    rm /usr/bin/aws
-    rm /usr/local/bin/aws
-    rm /usr/bin/aws_completer
-    rm /usr/local/bin/aws_completer
-    rm -rf /usr/local/aws-cli
+    rm /usr/bin/aws &> /dev/null
+    rm /usr/local/bin/aws &> /dev/null
+    rm /usr/bin/aws_completer &> /dev/null
+    rm /usr/local/bin/aws_completer &> /dev/null
+    rm -rf /usr/local/aws-cli &> /dev/null
 
     echo "Install latest awscli v2 ..."
     wget "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -P "/tmp/awscli/"  &> /dev/null

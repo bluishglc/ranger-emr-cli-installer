@@ -27,7 +27,7 @@ createEmrSecurityConfiguration() {
     printHeading "CREATE EMR SECURITY CONFIGURATION"
     # emr security configuration is dedicated for emr-native solution
     if [ "$SOLUTION" = "emr-native" ]; then
-    #    removeEmrSecurityConfigurationIfExists
+        removeEmrSecurityConfigurationIfExists
         createAuditEventsLogGroupIfNotExists
         confFile=$APP_HOME/conf/emr/security-configuration.json
         # backup existing version of conf file if exists
@@ -56,10 +56,12 @@ createEmrSecurityConfiguration() {
 }
 
 removeEmrSecurityConfigurationIfExists() {
+    printHeading "REMOVE EMR SECURITY CONFIGURATION IF EXISTS"
     output=$(aws emr delete-security-configuration --region $REGION --name "ranger@${RANGER_HOST}" 2>&1)
     echo $output
     if [ "$(echo $output|grep 'cannot be deleted because it is in use by active clusters')" = "0" ]; then
         echo "ERROR! The security configuration [ ranger@${RANGER_HOST} ] is in use!"
+        echo "Please remove all dependent emr clusters first, then re-try."
         exit 1
     fi
 }
