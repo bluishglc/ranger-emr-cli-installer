@@ -645,13 +645,13 @@ parseArgs() {
             OPENLDAP_USER_OBJECT_CLASS="inetOrgPerson"
         fi
         if [ "$OPENLDAP_RANGER_BIND_DN" = "" ]; then
-            OPENLDAP_RANGER_BIND_DN="cn=sssd,ou=services,$OPENLDAP_RANGER_BIND_DN"
+            OPENLDAP_RANGER_BIND_DN="cn=sssd,ou=services,$OPENLDAP_BASE_DN"
         fi
         if [ "$OPENLDAP_RANGER_BIND_PASSWORD" = "" ]; then
             OPENLDAP_RANGER_BIND_PASSWORD="$COMMON_DEFAULT_PASSWORD"
         fi
         if [ "$OPENLDAP_HUE_BIND_DN" = "" ]; then
-            OPENLDAP_HUE_BIND_DN="cn=hue,ou=services,$OPENLDAP_HUE_BIND_DN"
+            OPENLDAP_HUE_BIND_DN="cn=hue,ou=services,$OPENLDAP_BASE_DN"
         fi
         if [ "$OPENLDAP_HUE_BIND_PASSWORD" = "" ]; then
             OPENLDAP_HUE_BIND_PASSWORD="$COMMON_DEFAULT_PASSWORD"
@@ -679,7 +679,7 @@ resetAllOpts() {
     JAVA_HOME='/usr/lib/jvm/java'
     COMMON_DEFAULT_PASSWORD='Admin1234!'
     RANGER_VERSION='2.1.0'
-    RANGER_REPO_URL="https://github.com/bluishglc/ranger-repo/releases/download"
+    RANGER_REPO_URL='https://github.com/bluishglc/ranger-repo/releases/download'
     RANGER_SECRETS_DIR="/opt/ranger-$RANGER_VERSION-secrets"
     AUDIT_EVENTS_LOG_GROUP="/aws-emr/audit-events"
     RANGER_HOST=$(hostname -f)
