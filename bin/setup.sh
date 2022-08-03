@@ -11,7 +11,7 @@ export APP_HOME="$(
     pwd -P
 )"
 
-export APP_REMOTE_HOME="/opt/ranger-emr-cli-installer"
+export APP_REMOTE_HOME="/opt/${project.artifactId}"
 
 export AWS_PAGER=""
 
@@ -19,7 +19,7 @@ OPT_KEYS=(
     REGION ARN_ROOT SSH_KEY ACCESS_KEY_ID SECRET_ACCESS_KEY SOLUTION ENABLE_CROSS_REALM_TRUST TRUSTING_REALM TRUSTING_DOMAIN TRUSTING_HOST RANGER_SECRETS_DIR
     AUTH_PROVIDER AD_DOMAIN AD_URL AD_BASE_DN AD_RANGER_BIND_DN AD_RANGER_BIND_PASSWORD AD_HUE_BIND_DN AD_HUE_BIND_PASSWORD AD_USER_OBJECT_CLASS
     SKIP_INSTALL_OPENLDAP OPENLDAP_URL OPENLDAP_USER_DN_PATTERN OPENLDAP_GROUP_SEARCH_FILTER OPENLDAP_BASE_DN OPENLDAP_RANGER_BIND_DN OPENLDAP_RANGER_BIND_PASSWORD OPENLDAP_HUE_BIND_DN OPENLDAP_HUE_BIND_PASSWORD OPENLDAP_USER_OBJECT_CLASS
-    OPENLDAP_BASE_DN OPENLDAP_ROOT_CN OPENLDAP_ROOT_PASSWORD OPENLDAP_USERS_BASE_DN
+    OPENLDAP_BASE_DN OPENLDAP_ROOT_CN OPENLDAP_ROOT_DN OPENLDAP_ROOT_PASSWORD OPENLDAP_USERS_BASE_DN
     JAVA_HOME SKIP_INSTALL_MYSQL MYSQL_HOST MYSQL_ROOT_PASSWORD MYSQL_RANGER_DB_USER_PASSWORD
     SKIP_INSTALL_SOLR SOLR_HOST RANGER_HOST RANGER_PORT RANGER_REPO_URL RANGER_VERSION RANGER_PLUGINS
     KERBEROS_KDC_HOST SKIP_MIGRATE_KERBEROS_DB OPENLDAP_HOST
@@ -568,7 +568,7 @@ parseArgs() {
                 shift 2
                 ;;
             --sssd-bind-dn-password)
-                SSSD_BIND_DN_PASSWORD="$2"
+                SSSD_BIND_PASSWORD="$2"
                 shift 2
                 ;;
             --skip-configure-hue)
@@ -605,6 +605,13 @@ parseArgs() {
     RANGER_REPO_FILE_URL="$RANGER_REPO_URL/$RANGER_VERSION/ranger-repo.zip"
     # build ranger admin url
     RANGER_URL="${RANGER_PROTOCOL}://${RANGER_HOST}:${RANGER_PORT}"
+
+    # OpenLDAP-Specific vars bassed on base dn
+    OPENLDAP_ROOT_DN="cn=${OPENLDAP_ROOT_CN},${OPENLDAP_BASE_DN}"
+    OPENLDAP_USERS_BASE_DN="ou=users,$OPENLDAP_BASE_DN"
+    ORG_NAME=$(echo $OPENLDAP_BASE_DN | sed 's/dc=//g' | sed 's/,/./g')
+    ORG_DC=${ORG_NAME%%.*}
+
     if [ "$AUTH_PROVIDER" = "ad" ]; then
         # check if all required config items are set
         adKeys=(AD_DOMAIN AD_URL AD_BASE_DN AD_RANGER_BIND_DN AD_RANGER_BIND_PASSWORD)
@@ -626,6 +633,7 @@ parseArgs() {
 #                exit 1
 #            fi
 #        done
+
         # If not set, assign default value
         if [ "$OPENLDAP_USER_DN_PATTERN" = "" ]; then
             OPENLDAP_USER_DN_PATTERN="uid={0},$OPENLDAP_BASE_DN"
@@ -635,6 +643,24 @@ parseArgs() {
         fi
         if [ "$OPENLDAP_USER_OBJECT_CLASS" = "" ]; then
             OPENLDAP_USER_OBJECT_CLASS="inetOrgPerson"
+        fi
+        if [ "$OPENLDAP_RANGER_BIND_DN" = "" ]; then
+            OPENLDAP_RANGER_BIND_DN="cn=sssd,ou=services,$OPENLDAP_RANGER_BIND_DN"
+        fi
+        if [ "$OPENLDAP_RANGER_BIND_PASSWORD" = "" ]; then
+            OPENLDAP_RANGER_BIND_PASSWORD="$COMMON_DEFAULT_PASSWORD"
+        fi
+        if [ "$OPENLDAP_HUE_BIND_DN" = "" ]; then
+            OPENLDAP_HUE_BIND_DN="cn=hue,ou=services,$OPENLDAP_HUE_BIND_DN"
+        fi
+        if [ "$OPENLDAP_HUE_BIND_PASSWORD" = "" ]; then
+            OPENLDAP_HUE_BIND_PASSWORD="$COMMON_DEFAULT_PASSWORD"
+        fi
+        if [ "$SSSD_BIND_DN" = "" ]; then
+            SSSD_BIND_DN="cn=sssd,ou=services,$OPENLDAP_BASE_DN"
+        fi
+        if [ "$SSSD_BIND_PASSWORD" = "" ]; then
+            SSSD_BIND_PASSWORD="$COMMON_DEFAULT_PASSWORD"
         fi
     fi
 
@@ -672,13 +698,7 @@ resetAllOpts() {
     OPENLDAP_BASE_DN='dc=example,dc=com'
     OPENLDAP_ROOT_CN='admin'
     OPENLDAP_ROOT_PASSWORD=$COMMON_DEFAULT_PASSWORD
-    OPENLDAP_ROOT_DN="cn=${OPENLDAP_ROOT_CN},${OPENLDAP_BASE_DN}"
-    OPENLDAP_USERS_BASE_DN="ou=users,$OPENLDAP_BASE_DN"
     EXAMPLE_GROUP="example-group"
-    ORG_NAME=$(echo $OPENLDAP_BASE_DN | sed 's/dc=//g' | sed 's/,/./g')
-    ORG_DC=${ORG_NAME%%.*}
-    SSSD_BIND_DN='cn=sssd,ou=services,dc=example,dc=com'
-    SSSD_BIND_DN_PASSWORD=$COMMON_DEFAULT_PASSWORD
 }
 
 printAllOpts() {

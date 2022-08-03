@@ -42,7 +42,7 @@ ldap_tls_reqcert = never
 ldap_tls_cacertdir = /etc/openldap/cacerts
 ldap_default_bind_dn = $SSSD_BIND_DN
 ldap_default_authtok_type = password
-ldap_default_authtok = $SSSD_BIND_DN_PASSWORD
+ldap_default_authtok = $SSSD_BIND_PASSWORD
 override_homedir = /home/%u
 default_shell = /bin/bash
 [nss]
