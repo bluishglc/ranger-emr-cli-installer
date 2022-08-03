@@ -11,7 +11,10 @@ export APP_HOME="$(
     pwd -P
 )"
 
-export APP_REMOTE_HOME="/opt/${project.artifactId}"
+# It should NOT be a compile-phase var, otherwise it may miss var replacement when copy from maven project directly
+# It should be a dynamic var based on APP_HOME
+# export APP_REMOTE_HOME="/opt/${project.artifactId}"
+export APP_REMOTE_HOME="/opt/${APP_HOME##*/}"
 
 export AWS_PAGER=""
 

@@ -69,7 +69,7 @@ homeDirectory: /home/$user
 cn: $user
 uidNumber: $((1000+$RANDOM%9000))
 gidNumber: 100
-userPassword: $COMMON_DEFAULT_PASSWORD
+userPassword: $(slappasswd $COMMON_DEFAULT_PASSWORD)
 EOF
         # add user to group
         ldapsearch -D "$OPENLDAP_ROOT_DN" -w $OPENLDAP_ROOT_PASSWORD -b "cn=$EXAMPLE_GROUP,ou=groups,$OPENLDAP_BASE_DN" >& /dev/null

@@ -181,7 +181,7 @@ sn: sssd
 cn: sssd
 objectClass: top
 objectclass: person
-userPassword: $SSSD_BIND_PASSWORD
+userPassword: $(slappasswd $SSSD_BIND_PASSWORD)
 EOF
     # ranger bind user
     cat << EOF | ldapadd -D "$OPENLDAP_ROOT_DN" -w $OPENLDAP_ROOT_PASSWORD
@@ -190,7 +190,7 @@ sn: ranger
 cn: ranger
 objectClass: top
 objectclass: person
-userPassword: $OPENLDAP_RANGER_BIND_PASSWORD
+userPassword: $(slappasswd $OPENLDAP_RANGER_BIND_PASSWORD)
 EOF
     # hue bind user
     cat << EOF | ldapadd -D "$OPENLDAP_ROOT_DN" -w $OPENLDAP_ROOT_PASSWORD
@@ -199,7 +199,7 @@ sn: hue
 cn: hue
 objectClass: top
 objectclass: person
-userPassword: $OPENLDAP_HUE_BIND_PASSWORD
+userPassword: $(slappasswd $OPENLDAP_HUE_BIND_PASSWORD)
 EOF
 }
 
