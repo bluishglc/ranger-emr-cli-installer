@@ -176,30 +176,30 @@ EOF
 createServiceAccounts() {
     # sssd bind user
     cat << EOF | ldapadd -D "$OPENLDAP_ROOT_DN" -w $OPENLDAP_ROOT_PASSWORD
-dn: cn=sssd,ou=services,$OPENLDAP_BASE_DN
+dn: $SSSD_BIND_DN
 sn: sssd
 cn: sssd
 objectClass: top
 objectclass: person
-userPassword: $COMMON_DEFAULT_PASSWORD
+userPassword: $SSSD_BIND_PASSWORD
 EOF
     # ranger bind user
     cat << EOF | ldapadd -D "$OPENLDAP_ROOT_DN" -w $OPENLDAP_ROOT_PASSWORD
-dn: cn=ranger,ou=services,$OPENLDAP_BASE_DN
+dn: $OPENLDAP_RANGER_BIND_DN
 sn: ranger
 cn: ranger
 objectClass: top
 objectclass: person
-userPassword: $COMMON_DEFAULT_PASSWORD
+userPassword: $OPENLDAP_RANGER_BIND_PASSWORD
 EOF
     # hue bind user
     cat << EOF | ldapadd -D "$OPENLDAP_ROOT_DN" -w $OPENLDAP_ROOT_PASSWORD
-dn: cn=hue,ou=services,$OPENLDAP_BASE_DN
+dn: $OPENLDAP_HUE_BIND_DN
 sn: hue
 cn: hue
 objectClass: top
 objectclass: person
-userPassword: $COMMON_DEFAULT_PASSWORD
+userPassword: $OPENLDAP_HUE_BIND_PASSWORD
 EOF
 }
 
