@@ -13,7 +13,7 @@ export APP_HOME="$(
 
 # It should NOT be a compile-phase var, otherwise it may miss var replacement when copy from maven project directly
 # It should be a dynamic var based on APP_HOME
-# export APP_REMOTE_HOME="/opt/${project.artifactId}"
+# export APP_REMOTE_HOME="/opt/ranger-emr-cli-installer"
 export APP_REMOTE_HOME="/opt/${APP_HOME##*/}"
 
 export AWS_PAGER=""
@@ -21,7 +21,7 @@ export AWS_PAGER=""
 OPT_KEYS=(
     REGION ARN_ROOT SSH_KEY ACCESS_KEY_ID SECRET_ACCESS_KEY SOLUTION ENABLE_CROSS_REALM_TRUST TRUSTING_REALM TRUSTING_DOMAIN TRUSTING_HOST RANGER_SECRETS_DIR
     AUTH_PROVIDER AD_DOMAIN AD_URL AD_BASE_DN AD_RANGER_BIND_DN AD_RANGER_BIND_PASSWORD AD_HUE_BIND_DN AD_HUE_BIND_PASSWORD AD_USER_OBJECT_CLASS
-    SKIP_INSTALL_OPENLDAP OPENLDAP_URL OPENLDAP_USER_DN_PATTERN OPENLDAP_GROUP_SEARCH_FILTER OPENLDAP_BASE_DN OPENLDAP_RANGER_BIND_DN OPENLDAP_RANGER_BIND_PASSWORD OPENLDAP_HUE_BIND_DN OPENLDAP_HUE_BIND_PASSWORD OPENLDAP_USER_OBJECT_CLASS
+    SKIP_INSTALL_OPENLDAP OPENLDAP_URL OPENLDAP_USER_DN_PATTERN OPENLDAP_GROUP_SEARCH_FILTER OPENLDAP_BASE_DN RANGER_BIND_DN RANGER_BIND_PASSWORD HUE_BIND_DN HUE_BIND_PASSWORD OPENLDAP_USER_OBJECT_CLASS
     OPENLDAP_BASE_DN OPENLDAP_ROOT_CN OPENLDAP_ROOT_DN OPENLDAP_ROOT_PASSWORD OPENLDAP_USERS_BASE_DN
     JAVA_HOME SKIP_INSTALL_MYSQL MYSQL_HOST MYSQL_ROOT_PASSWORD MYSQL_RANGER_DB_USER_PASSWORD
     SKIP_INSTALL_SOLR SOLR_HOST RANGER_HOST RANGER_PORT RANGER_REPO_URL RANGER_VERSION RANGER_PLUGINS
@@ -283,8 +283,8 @@ parseArgs() {
         solution:,enable-cross-realm-trust:,trusting-realm:,trusting-domain:,trusting-host:,ranger-version:,ranger-repo-url:,restart-interval:,ranger-host:,ranger-secrets-dir:,ranger-plugins:,\
         auth-provider:,ad-domain:,ad-base-dn:,ad-ranger-bind-dn:,ad-ranger-bind-password:,ad-hue-dn:,ad-hue-password:,ad-user-object-class:,\
         openldap-host:,openldap-base-dn:,openldap-root-cn:,openldap-root-password:,example-users:,\
-        sssd-bind-dn:,sssd-bind-dn-password:,\
-        skip-install-openldap:,openldap-user-dn-pattern:,openldap-group-search-filter:,openldap-base-dn:,openldap-ranger-bind-dn:,openldap-ranger-bind-password:,openldap-hue-bind-dn:,openldap-hue-bind-password:,openldap-user-object-class:,\
+        sssd-bind-dn:,sssd-bind-password:,\
+        skip-install-openldap:,openldap-user-dn-pattern:,openldap-group-search-filter:,openldap-base-dn:,ranger-bind-dn:,ranger-bind-password:,hue-bind-dn:,hue-bind-password:,openldap-user-object-class:,\
         skip-install-mysql:,mysql-host:,mysql-root-password:,mysql-ranger-db-user-password:,skip-install-solr:,solr-host:,\
         emr-cluster-id:,skip-configure-hue:\
     "
@@ -438,20 +438,20 @@ parseArgs() {
                 OPENLDAP_BASE_DN="$2"
                 shift 2
                 ;;
-            --openldap-ranger-bind-dn)
-                OPENLDAP_RANGER_BIND_DN="$2"
+            --ranger-bind-dn)
+                RANGER_BIND_DN="$2"
                 shift 2
                 ;;
-            --openldap-ranger-bind-password)
-                OPENLDAP_RANGER_BIND_PASSWORD="$2"
+            --ranger-bind-password)
+                RANGER_BIND_PASSWORD="$2"
                 shift 2
                 ;;
-            --openldap-hue-bind-dn)
-                OPENLDAP_HUE_BIND_DN="$2"
+            --hue-bind-dn)
+                HUE_BIND_DN="$2"
                 shift 2
                 ;;
-            --openldap-hue-bind-password)
-                OPENLDAP_HUE_BIND_PASSWORD="$2"
+            --hue-bind-password)
+                HUE_BIND_PASSWORD="$2"
                 shift 2
                 ;;
             --openldap-user-object-class)
@@ -570,7 +570,7 @@ parseArgs() {
                 SSSD_BIND_DN="$2"
                 shift 2
                 ;;
-            --sssd-bind-dn-password)
+            --sssd-bind-password)
                 SSSD_BIND_PASSWORD="$2"
                 shift 2
                 ;;
@@ -647,17 +647,17 @@ parseArgs() {
         if [ "$OPENLDAP_USER_OBJECT_CLASS" = "" ]; then
             OPENLDAP_USER_OBJECT_CLASS="inetOrgPerson"
         fi
-        if [ "$OPENLDAP_RANGER_BIND_DN" = "" ]; then
-            OPENLDAP_RANGER_BIND_DN="cn=sssd,ou=services,$OPENLDAP_BASE_DN"
+        if [ "$RANGER_BIND_DN" = "" ]; then
+            RANGER_BIND_DN="cn=ranger,ou=services,$OPENLDAP_BASE_DN"
         fi
-        if [ "$OPENLDAP_RANGER_BIND_PASSWORD" = "" ]; then
-            OPENLDAP_RANGER_BIND_PASSWORD="$COMMON_DEFAULT_PASSWORD"
+        if [ "$RANGER_BIND_PASSWORD" = "" ]; then
+            RANGER_BIND_PASSWORD="$COMMON_DEFAULT_PASSWORD"
         fi
-        if [ "$OPENLDAP_HUE_BIND_DN" = "" ]; then
-            OPENLDAP_HUE_BIND_DN="cn=hue,ou=services,$OPENLDAP_BASE_DN"
+        if [ "$HUE_BIND_DN" = "" ]; then
+            HUE_BIND_DN="cn=hue,ou=services,$OPENLDAP_BASE_DN"
         fi
-        if [ "$OPENLDAP_HUE_BIND_PASSWORD" = "" ]; then
-            OPENLDAP_HUE_BIND_PASSWORD="$COMMON_DEFAULT_PASSWORD"
+        if [ "$HUE_BIND_PASSWORD" = "" ]; then
+            HUE_BIND_PASSWORD="$COMMON_DEFAULT_PASSWORD"
         fi
         if [ "$SSSD_BIND_DN" = "" ]; then
             SSSD_BIND_DN="cn=sssd,ou=services,$OPENLDAP_BASE_DN"
@@ -682,7 +682,7 @@ resetAllOpts() {
     JAVA_HOME='/usr/lib/jvm/java'
     COMMON_DEFAULT_PASSWORD='Admin1234!'
     RANGER_VERSION='2.1.0'
-    RANGER_REPO_URL='https://github.com/bluishglc/ranger-repo/releases/download'
+    RANGER_REPO_URL="https://github.com/bluishglc/ranger-repo/releases/download"
     RANGER_SECRETS_DIR="/opt/ranger-$RANGER_VERSION-secrets"
     AUDIT_EVENTS_LOG_GROUP="/aws-emr/audit-events"
     RANGER_HOST=$(hostname -f)
@@ -767,8 +767,8 @@ printUsage() {
     echo "--openldap-user-dn-pattern                Specify the user dn pattern of Open LDAP"
     echo "--openldap-group-search-filter            Specify the group search filter of Open LDAP"
     echo "--openldap-base-dn                        Specify the base dn of Open LDAP"
-    echo "--openldap-ranger-bind-dn                        Specify the bind dn of Open LDAP"
-    echo "--openldap-ranger-bind-password                  Specify the bind password of Open LDAP"
+    echo "--ranger-bind-dn                        Specify the bind dn of Open LDAP"
+    echo "--ranger-bind-password                  Specify the bind password of Open LDAP"
     echo "--openldap-user-object-class              Specify the user object class of Open LDAP"
     echo "--java-home                           Specify the JAVA_HOME path, default value is /usr/lib/jvm/java"
     echo "--skip-install-mysql [true|false]     Specify If skip mysql installing or not, default value is 'false'"
@@ -830,8 +830,8 @@ EOF
     --auth-provider openldap \\
     --openldap-url ldap://10.0.0.41 \\
     --openldap-base-dn 'dc=example,dc=com' \\
-    --openldap-ranger-bind-dn 'cn=ranger-binder,ou=service accounts,dc=example,dc=com' \\
-    --openldap-ranger-bind-password 'Admin1234!' \\
+    --ranger-bind-dn 'cn=ranger-binder,ou=service accounts,dc=example,dc=com' \\
+    --ranger-bind-password 'Admin1234!' \\
     --openldap-user-dn-pattern 'uid={0},dc=example,dc=com' \\
     --openldap-group-search-filter '(member=uid={0},dc=example,dc=com)' \\
     --openldap-user-object-class inetOrgPerson \\

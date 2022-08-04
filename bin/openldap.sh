@@ -14,7 +14,13 @@ installOpenldap() {
             --openldap-host $OPENLDAP_HOST \
             --openldap-base-dn $OPENLDAP_BASE_DN \
             --openldap-root-cn $OPENLDAP_ROOT_CN \
-            --openldap-root-password $OPENLDAP_ROOT_PASSWORD
+            --openldap-root-password $OPENLDAP_ROOT_PASSWORD \
+            --ranger-bind-dn $RANGER_BIND_DN \
+            --ranger-bind-password $RANGER_BIND_PASSWORD \
+            --hue-bind-dn $HUE_BIND_DN \
+            --hue-bind-password $HUE_BIND_PASSWORD \
+            --sssd-bind-dn $SSSD_BIND_DN \
+            --sssd-bind-password $SSSD_BIND_PASSWORD
 }
 
 installOpenldapOnLocal() {
@@ -181,25 +187,25 @@ sn: sssd
 cn: sssd
 objectClass: top
 objectclass: person
-userPassword: $(slappasswd $SSSD_BIND_PASSWORD)
+userPassword: $(slappasswd -s $SSSD_BIND_PASSWORD)
 EOF
     # ranger bind user
     cat << EOF | ldapadd -D "$OPENLDAP_ROOT_DN" -w $OPENLDAP_ROOT_PASSWORD
-dn: $OPENLDAP_RANGER_BIND_DN
+dn: $RANGER_BIND_DN
 sn: ranger
 cn: ranger
 objectClass: top
 objectclass: person
-userPassword: $(slappasswd $OPENLDAP_RANGER_BIND_PASSWORD)
+userPassword: $(slappasswd -s $RANGER_BIND_PASSWORD)
 EOF
     # hue bind user
     cat << EOF | ldapadd -D "$OPENLDAP_ROOT_DN" -w $OPENLDAP_ROOT_PASSWORD
-dn: $OPENLDAP_HUE_BIND_DN
+dn: $HUE_BIND_DN
 sn: hue
 cn: hue
 objectClass: top
 objectclass: person
-userPassword: $(slappasswd $OPENLDAP_HUE_BIND_PASSWORD)
+userPassword: $(slappasswd -s $HUE_BIND_PASSWORD)
 EOF
 }
 

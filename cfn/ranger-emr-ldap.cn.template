@@ -232,8 +232,8 @@ Resources:
           --auth-provider openldap \
           --openldap-url ${LdapUrl} \
           --openldap-base-dn '${LdapBaseDn}' \
-          --openldap-ranger-bind-dn '${LdapRangerBindDn}' \
-          --openldap-ranger-bind-password '${LdapRangerBindPassword}' \
+          --ranger-bind-dn '${LdapRangerBindDn}' \
+          --ranger-bind-password '${LdapRangerBindPassword}' \
           --openldap-user-dn-pattern '${LdapUserDnPattern}' \
           --openldap-group-search-filter '${LdapGroupSearchFilter}' \
           --openldap-user-object-class '${LdapUserObjectClass}' \

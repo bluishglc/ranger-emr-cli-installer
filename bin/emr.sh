@@ -85,8 +85,8 @@ configHueOpenldapProps() {
     sed -i "s|@OPENLDAP_HOST@|$OPENLDAP_HOST|g" $confFile
     sed -i "s|@OPENLDAP_BASE_DN@|$OPENLDAP_BASE_DN|g" $confFile
     sed -i "s|@OPENLDAP_USER_OBJECT_CLASS@|$OPENLDAP_USER_OBJECT_CLASS|g" $confFile
-    sed -i "s|@OPENLDAP_HUE_BIND_DN@|$OPENLDAP_HUE_BIND_DN|g" $confFile
-    sed -i "s|@OPENLDAP_HUE_BIND_PASSWORD@|$OPENLDAP_HUE_BIND_PASSWORD|g" $confFile
+    sed -i "s|@HUE_BIND_DN@|$HUE_BIND_DN|g" $confFile
+    sed -i "s|@HUE_BIND_PASSWORD@|$HUE_BIND_PASSWORD|g" $confFile
 }
 
 updateHueConfiguration() {

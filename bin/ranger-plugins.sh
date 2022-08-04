@@ -17,7 +17,7 @@ testLdapConnectivity() {
         ldapsearch -x -LLL -D "$AD_RANGER_BIND_DN" -w "$AD_RANGER_BIND_PASSWORD" -H "$AD_URL" -b "$AD_BASE_DN" dn
     elif [ "$AUTH_PROVIDER" = "openldap" ]; then
         echo "Searched following dn from OpenLDAP server with given configs:"
-        ldapsearch -x -LLL -D "$OPENLDAP_RANGER_BIND_DN" -w "$OPENLDAP_RANGER_BIND_PASSWORD" -H "$OPENLDAP_URL" -b "$OPENLDAP_BASE_DN" dn
+        ldapsearch -x -LLL -D "$RANGER_BIND_DN" -w "$RANGER_BIND_PASSWORD" -H "$OPENLDAP_URL" -b "$OPENLDAP_BASE_DN" dn
     else
         echo "Invalid authentication type, only AD and LDAP are supported!"
         exit 1

@@ -21,8 +21,8 @@ configRangerUsersyncOpenldapProps() {
     confFile="$1"
     sed -i "s|@OPENLDAP_URL@|$OPENLDAP_URL|g" $confFile
     sed -i "s|@OPENLDAP_BASE_DN@|$OPENLDAP_BASE_DN|g" $confFile
-    sed -i "s|@OPENLDAP_RANGER_BIND_DN@|$OPENLDAP_RANGER_BIND_DN|g" $confFile
-    sed -i "s|@OPENLDAP_RANGER_BIND_PASSWORD@|$OPENLDAP_RANGER_BIND_PASSWORD|g" $confFile
+    sed -i "s|@RANGER_BIND_DN@|$RANGER_BIND_DN|g" $confFile
+    sed -i "s|@RANGER_BIND_PASSWORD@|$RANGER_BIND_PASSWORD|g" $confFile
     sed -i "s|@OPENLDAP_USER_OBJECT_CLASS@|$OPENLDAP_USER_OBJECT_CLASS|g" $confFile
 }
 

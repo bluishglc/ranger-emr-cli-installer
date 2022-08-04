@@ -2,7 +2,6 @@
 
 createIamRoles() {
     # create iam roles if not exists
-    aws cloudformation get-template --region $REGION --stack-name emr-ranger-iam-roles &> /dev/null
     # it is NOT a good idea to identify if roles are created by checking if its cfn is created,
     # because cfn is region-specific, however, roles are NOT, so if install cfn on a region,
     # the cfn is invisible in other regions, at this moment, if we run this tool on other region,

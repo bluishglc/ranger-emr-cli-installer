@@ -31,7 +31,7 @@ installMySqlViaYum() {
     rpm -ivh /tmp/mysql57-community-release-el7-11.noarch.rpm
     # update gpg key, this is required after 2022
     rpm --import https://repo.mysql.com/RPM-GPG-KEY-mysql-2022
-    yum -y install mysql-community-server
+    yum -y install mysql-community-server --nogpgcheck
 }
 
 installMySqlViaRpm() {
@@ -50,7 +50,7 @@ installMySqlCliIfNotExists() {
     if [ ! "$?" = "0" ]; then
         printHeading "INSTALL MYSQL CLI CLIENT FOR CONNECTIVITY TESTING"
         echo "MySQL client has not been installed yet, will install right now!"
-        yum -y install mysql-community-server
+        yum -y install mysql-community-client --nogpgcheck
         if [ ! -f /tmp/mysql57-community-release-el7-11.noarch.rpm ]; then
             wget https://dev.mysql.com/get/mysql57-community-release-el7-11.noarch.rpm -P /tmp/
         fi
