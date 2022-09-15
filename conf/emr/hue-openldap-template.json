@@ -25,6 +25,7 @@
                           "base_dn": "@OPENLDAP_BASE_DN@",
                           "bind_dn": "@HUE_BIND_DN@",
                           "bind_password": "@HUE_BIND_PASSWORD@",
+                          "use_start_tls": "false",
                           "search_bind_authentication": "true",
                           "create_users_on_login": "false"
                         },

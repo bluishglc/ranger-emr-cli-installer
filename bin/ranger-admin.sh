@@ -24,8 +24,8 @@ configRangerAdminAdProps() {
     sed -i "s|@AD_DOMAIN@|$AD_DOMAIN|g" $confFile
     sed -i "s|@AD_URL@|$AD_URL|g" $confFile
     sed -i "s|@AD_BASE_DN@|$AD_BASE_DN|g" $confFile
-    sed -i "s|@AD_RANGER_BIND_DN@|$AD_RANGER_BIND_DN|g" $confFile
-    sed -i "s|@AD_RANGER_BIND_PASSWORD@|$AD_RANGER_BIND_PASSWORD|g" $confFile
+    sed -i "s|@RANGER_BIND_DN@|$RANGER_BIND_DN|g" $confFile
+    sed -i "s|@RANGER_BIND_PASSWORD@|$RANGER_BIND_PASSWORD|g" $confFile
     sed -i "s|@AD_USER_OBJECT_CLASS@|$AD_USER_OBJECT_CLASS|g" $confFile
 }
 
@@ -126,7 +126,7 @@ installRangerAdmin() {
     sh setup.sh
     sh set_globals.sh
     cd $curDir
-    installXmlstarletIfNotExists
+#    installXmlstarletIfNotExists
     # Ranger installation scripts have BUG!!
     # although, for the sake of security, ranger write password to a key store file,
     # however, it does not work, and at the same time, it removes password in xml conf file with "_",

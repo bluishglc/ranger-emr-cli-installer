@@ -12,8 +12,8 @@ configRangerUsersyncAdProps() {
     confFile="$1"
     sed -i "s|@AD_URL@|$AD_URL|g" $confFile
     sed -i "s|@AD_BASE_DN@|$AD_BASE_DN|g" $confFile
-    sed -i "s|@AD_RANGER_BIND_DN@|$AD_RANGER_BIND_DN|g" $confFile
-    sed -i "s|@AD_RANGER_BIND_PASSWORD@|$AD_RANGER_BIND_PASSWORD|g" $confFile
+    sed -i "s|@RANGER_BIND_DN@|$RANGER_BIND_DN|g" $confFile
+    sed -i "s|@RANGER_BIND_PASSWORD@|$RANGER_BIND_PASSWORD|g" $confFile
     sed -i "s|@AD_USER_OBJECT_CLASS@|$AD_USER_OBJECT_CLASS|g" $confFile
 }
 

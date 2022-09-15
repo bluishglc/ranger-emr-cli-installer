@@ -73,8 +73,8 @@ configHueAdProps() {
     sed -i "s|@AD_DOMAIN@|$AD_DOMAIN|g" $confFile
     sed -i "s|@AD_URL@|$AD_URL|g" $confFile
     sed -i "s|@AD_BASE_DN@|$AD_BASE_DN|g" $confFile
-    sed -i "s|@AD_HUE_BIND_DN@|$AD_HUE_BIND_DN|g" $confFile
-    sed -i "s|@AD_HUE_PASSWORD@|$AD_HUE_PASSWORD|g" $confFile
+    sed -i "s|@HUE_BIND_DN@|$HUE_BIND_DN|g" $confFile
+    sed -i "s|@HUE_BIND_PASSWORD@|$HUE_BIND_PASSWORD|g" $confFile
 }
 
 configHueOpenldapProps() {
@@ -89,7 +89,7 @@ configHueOpenldapProps() {
     sed -i "s|@HUE_BIND_PASSWORD@|$HUE_BIND_PASSWORD|g" $confFile
 }
 
-updateHueConfiguration() {
+configHue() {
     printHeading "UPDATE HUE CONFIGURATION"
     confFile=$APP_HOME/conf/emr/hue-$AUTH_PROVIDER.json
     # backup existing version of conf file if exists

@@ -20,7 +20,7 @@ export AWS_PAGER=""
 
 OPT_KEYS=(
     REGION ARN_ROOT SSH_KEY ACCESS_KEY_ID SECRET_ACCESS_KEY SOLUTION ENABLE_CROSS_REALM_TRUST TRUSTING_REALM TRUSTING_DOMAIN TRUSTING_HOST RANGER_SECRETS_DIR
-    AUTH_PROVIDER AD_DOMAIN AD_URL AD_BASE_DN AD_RANGER_BIND_DN AD_RANGER_BIND_PASSWORD AD_HUE_BIND_DN AD_HUE_BIND_PASSWORD AD_USER_OBJECT_CLASS
+    AUTH_PROVIDER AD_DOMAIN AD_URL AD_BASE_DN RANGER_BIND_DN RANGER_BIND_PASSWORD HUE_BIND_DN HUE_BIND_PASSWORD AD_USER_OBJECT_CLASS
     SKIP_INSTALL_OPENLDAP OPENLDAP_URL OPENLDAP_USER_DN_PATTERN OPENLDAP_GROUP_SEARCH_FILTER OPENLDAP_BASE_DN RANGER_BIND_DN RANGER_BIND_PASSWORD HUE_BIND_DN HUE_BIND_PASSWORD OPENLDAP_USER_OBJECT_CLASS
     OPENLDAP_BASE_DN OPENLDAP_ROOT_CN OPENLDAP_ROOT_DN OPENLDAP_ROOT_PASSWORD OPENLDAP_USERS_BASE_DN
     JAVA_HOME SKIP_INSTALL_MYSQL MYSQL_HOST MYSQL_ROOT_PASSWORD MYSQL_RANGER_DB_USER_PASSWORD
@@ -62,18 +62,20 @@ install() {
     fi
 
     installRanger
-    installRangerPlugins
-
     # because of circular dependency between ranger and emr installation for openldap + emr-native solution
     # the installation progress need pending for creating emr cluster
-    if [[ "$AUTH_PROVIDER" = "openldap" && "$SOLUTION" = "emr-native" ]]; then
-        waitForCreatingEmrCluster
-    fi
+#    if [[ "$AUTH_PROVIDER" = "openldap" && "$SOLUTION" = "emr-native" ]]; then
+    waitForCreatingEmrCluster
+    testEmrSshConnectivity
+#    fi
+
+    # If for ad, only need pending and waiting for input cluster id
 
     # for OpenLDAP + EMR Native Ranger solution, need enable sasl/gssapi and migrate kerberos db
     if [[ "$AUTH_PROVIDER" = "openldap" && "$SOLUTION" = "emr-native" ]]; then
         enableSaslGssapi
         if [[ "$SKIP_MIGRATE_KERBEROS_DB" = "false" ]]; then
+            testKerberosKdcConnectivity
             # BE CAREFUL!!
             # the puppet of EMR will always revert changes of kdc.conf
             # so will disable migrating kerberos db job, this does NOT block other functions.
@@ -102,71 +104,56 @@ install() {
     # by default, we will update it to achieve completed installation, if you have other
     # configurations, please set "--skip-configure-hue true".
     if [ "$SKIP_CONFIGURE_HUE" = "false" ]; then
-        updateHueConfiguration
+        configHue
     fi
 #    fi
     # add example users if --example-users provided
     if [[ "$AUTH_PROVIDER" = "openldap" && "${EXAMPLE_USERS[*]}" != "" ]]; then
         addExampleUsers
     fi
+
+    installRangerPlugins
+    installRangerPlugins
+
     printHeading "ALL DONE!!"
 }
 
 waitForCreatingEmrCluster() {
     printHeading "CREATE EMR CLUSTER"
-    confirmed="false"
-    while [[ $confirmed != "true" ]]; do
-        echo -ne "1. Create an emr cluster from emr web console. \n\n"
-        echo -ne ">> Be sure to select this ec2 instance profile: \E[33m[ EMR_EC2_RangerRole ]\n\n\E[0m"
-        echo -ne ">> Be sure to select this security configuration: \E[33m[ ranger@$RANGER_HOST ]\n\n\E[0m"
-        answered="false"
-        while [[ $answered != "true" ]]; do
-            read -p "Have you created the cluster? [y/n]: " answer
-            case $answer in
-                y|Y)
-                    confirmed="true"; answered="true"
-                ;;
-                n|N)
-                    confirmed="false"; answered="true"
-                ;;
-                *)
-                    confirmed="false"; answered="false"
-                ;;
-            esac
+    num=1
+
+    if [[ "$SOLUTION" = "emr-native" ]]; then
+        confirmed="false"
+        while [[ "$confirmed" != "true" ]]; do
+            echo -ne "$((num++)). Create an emr cluster from emr web console. \n\n"
+            echo -ne ">> Be sure to select this ec2 instance profile: \E[33m[ EMR_EC2_RangerRole ]\n\n\E[0m"
+            echo -ne ">> Be sure to select this security configuration: \E[33m[ ranger@$RANGER_HOST ]\n\n\E[0m"
+            confirmed=$(askForConfirmation "Have you created the cluster?")
             echo ""
         done
-    done
+    fi
 
     confirmed="false"
-    while [[ ! $confirmed = "true" ]]; do
-        read -p "2. Enter the emr cluster id: " EMR_CLUSTER_ID
+    while [[ ! "$confirmed" = "true" ]]; do
+        read -p "$((num++)). Enter the emr cluster id: " EMR_CLUSTER_ID
         echo -ne "\n>> Accepted the emr cluster id: \E[33m[ $EMR_CLUSTER_ID ]\E[0m\n\n"
 
-        read -p "3. Enter the emr cluster kerberos realm: " KERBEROS_REALM
-        echo -ne "\n>> Accepted the emr cluster kerberos realm: \E[33m[ $KERBEROS_REALM ]\E[0m\n\n"
+        if [[ "$AUTH_PROVIDER" = "openldap" && "$SOLUTION" = "emr-native" ]]; then
+            read -p "$((num++)). Enter the emr cluster kerberos realm: " KERBEROS_REALM
+            echo -ne "\n>> Accepted the emr cluster kerberos realm: \E[33m[ $KERBEROS_REALM ]\E[0m\n\n"
 
-        read -p "4. Enter the emr cluster kerberos kadmin password: " KERBEROS_KADMIN_PASSWORD
-        echo -ne "\n>> Accepted the emr cluster kerberos kadmin password: \E[33m[ $KERBEROS_KADMIN_PASSWORD ]\E[0m\n\n"
+            read -p "$((num++)). Enter the emr cluster kerberos kadmin password: " KERBEROS_KADMIN_PASSWORD
+            echo -ne "\n>> Accepted the emr cluster kerberos kadmin password: \E[33m[ $KERBEROS_KADMIN_PASSWORD ]\E[0m\n\n"
 
-        read -p "5. Enter the private DNS (FQDN) of emr cluster kerberos kdc host: " KERBEROS_KDC_HOST
-        echo -ne "\n>> Accepted the private DNS (FQDN) of emr cluster kerberos kdc host: \E[33m[ $KERBEROS_KDC_HOST ]\E[0m\n\n"
+            read -p "$((num++)). Enter the private DNS (FQDN) of emr cluster kerberos KDC host: " KERBEROS_KDC_HOST
+            echo -ne "\n>> Accepted the private DNS (FQDN) of emr cluster kerberos KDC host: \E[33m[ $KERBEROS_KDC_HOST ]\E[0m\n\n"
+            askHueAndLdapIntegration "$((num++))"
+        else
+            askHueAndLdapIntegration "$((num++))"
+        fi
 
-        answered="false"
-        while [[ $answered != "true" ]]; do
-            read -p "Do you confirm all above? [y/n]: " answer
-            case $answer in
-                y|Y)
-                    confirmed="true"; answered="true"
-                ;;
-                n|N)
-                    confirmed="false"; answered="true"
-                ;;
-                *)
-                    confirmed="false"; answered="false"
-                ;;
-            esac
-            echo ""
-        done
+        confirmed=$(askForConfirmation "Do you confirm all above?")
+        echo ""
     done
 
     echo -ne "Waiting for emr cluster creating...\n\n"
@@ -188,9 +175,18 @@ waitForCreatingEmrCluster() {
             fi
         fi
     done
-    echo "Start to test connectivity of cluster [ $EMR_CLUSTER_ID ] ..."
-    testEmrSshConnectivity
-    testKerberosKdcConnectivity
+}
+
+askHueAndLdapIntegration() {
+    num="$1"
+    integrateHueAndLdap=$(askForConfirmation "$num. Do you want Hue to integrate with LDAP? (Be careful! if yes, emr existing configuration will be overwritten!)")
+    if [[ "$integrateHueAndLdap" = "true" ]]; then
+        SKIP_CONFIGURE_HUE="false"
+        echo -ne "\n>> You selected: \E[33m[ Yes ]\E[0m\n\n"
+    elif [[ "$integrateHueAndLdap" = "false" ]]; then
+        SKIP_CONFIGURE_HUE="true"
+        echo -ne "\n>> You selected: \E[33m[ No ]\E[0m\n\n"
+    fi
 }
 
 installRanger() {
@@ -281,7 +277,7 @@ parseArgs() {
         region:,ssh-key:,access-key-id:,secret-access-key:,java-home:,\
         skip-migrate-kerberos-db:,kerberos-realm:,kerberos-kdc-host:,kerberos-kadmin-password:,\
         solution:,enable-cross-realm-trust:,trusting-realm:,trusting-domain:,trusting-host:,ranger-version:,ranger-repo-url:,restart-interval:,ranger-host:,ranger-secrets-dir:,ranger-plugins:,\
-        auth-provider:,ad-domain:,ad-base-dn:,ad-ranger-bind-dn:,ad-ranger-bind-password:,ad-hue-dn:,ad-hue-password:,ad-user-object-class:,\
+        auth-provider:,ad-host:,ad-domain:,ad-base-dn:,ad-user-object-class:,\
         openldap-host:,openldap-base-dn:,openldap-root-cn:,openldap-root-password:,example-users:,\
         sssd-bind-dn:,sssd-bind-password:,\
         skip-install-openldap:,openldap-user-dn-pattern:,openldap-group-search-filter:,openldap-base-dn:,ranger-bind-dn:,ranger-bind-password:,hue-bind-dn:,hue-bind-password:,openldap-user-object-class:,\
@@ -404,22 +400,6 @@ parseArgs() {
                 ;;
             --ad-base-dn)
                 AD_BASE_DN="$2"
-                shift 2
-                ;;
-            --ad-ranger-bind-dn)
-                AD_RANGER_BIND_DN="$2"
-                shift 2
-                ;;
-            --ad-ranger-bind-password)
-                AD_RANGER_BIND_PASSWORD="$2"
-                shift 2
-                ;;
-            --ad-hue-bind-dn)
-                AD_HUE_BIND_DN="$2"
-                shift 2
-                ;;
-            --ad-hue-bind-password)
-                AD_HUE_BIND_PASSWORD="$2"
                 shift 2
                 ;;
             --ad-user-object-class)
@@ -617,7 +597,7 @@ parseArgs() {
 
     if [ "$AUTH_PROVIDER" = "ad" ]; then
         # check if all required config items are set
-        adKeys=(AD_DOMAIN AD_URL AD_BASE_DN AD_RANGER_BIND_DN AD_RANGER_BIND_PASSWORD)
+        adKeys=(AD_DOMAIN AD_URL AD_BASE_DN RANGER_BIND_DN RANGER_BIND_PASSWORD)
 #        for key in "${adKeys[@]}"; do
 #            if [ "$(eval echo \$$key)" = "" ]; then
 #                echo "ERROR: [ $key ] is NOT set, it is required for Windows AD config."
@@ -647,26 +627,26 @@ parseArgs() {
         if [ "$OPENLDAP_USER_OBJECT_CLASS" = "" ]; then
             OPENLDAP_USER_OBJECT_CLASS="inetOrgPerson"
         fi
-        if [ "$RANGER_BIND_DN" = "" ]; then
-            RANGER_BIND_DN="cn=ranger,ou=services,$OPENLDAP_BASE_DN"
-        fi
-        if [ "$RANGER_BIND_PASSWORD" = "" ]; then
-            RANGER_BIND_PASSWORD="$COMMON_DEFAULT_PASSWORD"
-        fi
-        if [ "$HUE_BIND_DN" = "" ]; then
-            HUE_BIND_DN="cn=hue,ou=services,$OPENLDAP_BASE_DN"
-        fi
-        if [ "$HUE_BIND_PASSWORD" = "" ]; then
-            HUE_BIND_PASSWORD="$COMMON_DEFAULT_PASSWORD"
-        fi
-        if [ "$SSSD_BIND_DN" = "" ]; then
-            SSSD_BIND_DN="cn=sssd,ou=services,$OPENLDAP_BASE_DN"
-        fi
-        if [ "$SSSD_BIND_PASSWORD" = "" ]; then
-            SSSD_BIND_PASSWORD="$COMMON_DEFAULT_PASSWORD"
-        fi
     fi
 
+    if [ "$RANGER_BIND_DN" = "" ]; then
+        RANGER_BIND_DN="cn=ranger,ou=services,$OPENLDAP_BASE_DN"
+    fi
+    if [ "$RANGER_BIND_PASSWORD" = "" ]; then
+        RANGER_BIND_PASSWORD="$COMMON_DEFAULT_PASSWORD"
+    fi
+    if [ "$HUE_BIND_DN" = "" ]; then
+        HUE_BIND_DN="cn=hue,ou=services,$OPENLDAP_BASE_DN"
+    fi
+    if [ "$HUE_BIND_PASSWORD" = "" ]; then
+        HUE_BIND_PASSWORD="$COMMON_DEFAULT_PASSWORD"
+    fi
+    if [ "$SSSD_BIND_DN" = "" ]; then
+        SSSD_BIND_DN="cn=sssd,ou=services,$OPENLDAP_BASE_DN"
+    fi
+    if [ "$SSSD_BIND_PASSWORD" = "" ]; then
+        SSSD_BIND_PASSWORD="$COMMON_DEFAULT_PASSWORD"
+    fi
     # print all resolved options
     printAllOpts
 }
@@ -760,8 +740,6 @@ printUsage() {
     echo "--auth-provider [ad|ldap]                 Authentication type, optional value: ad or ldap"
     echo "--ad-domain                           Specify the domain name of windows ad server"
     echo "--ad-base-dn                          Specify the base dn of windows ad server"
-    echo "--ad-ranger-bind-dn                          Specify the bind dn of windows ad server"
-    echo "--ad-ranger-bind-password                    Specify the bind password of windows ad server"
     echo "--ad-user-object-class                Specify the user object class of windows ad server"
     echo "--openldap-url                            Specify the ldap url of Open LDAP, i.e. ldap://10.0.0.1"
     echo "--openldap-user-dn-pattern                Specify the user dn pattern of Open LDAP"
@@ -963,8 +941,8 @@ case $ACTION in
     install-ranger-usersync)
         installRangerUsersync
     ;;
-    update-hue-configuration)
-        updateHueConfiguration
+    configure-hue)
+        configHue
     ;;
 
     # --- EMR Operations --- #

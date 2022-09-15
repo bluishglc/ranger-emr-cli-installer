@@ -14,7 +14,7 @@ testLdapConnectivity() {
     fi
     if [ "$AUTH_PROVIDER" = "ad" ]; then
         echo "Searched following dn from Windows AD server with given configs:"
-        ldapsearch -x -LLL -D "$AD_RANGER_BIND_DN" -w "$AD_RANGER_BIND_PASSWORD" -H "$AD_URL" -b "$AD_BASE_DN" dn
+        ldapsearch -x -LLL -D "$RANGER_BIND_DN" -w "$RANGER_BIND_PASSWORD" -H "$AD_URL" -b "$AD_BASE_DN" dn
     elif [ "$AUTH_PROVIDER" = "openldap" ]; then
         echo "Searched following dn from OpenLDAP server with given configs:"
         ldapsearch -x -LLL -D "$RANGER_BIND_DN" -w "$RANGER_BIND_PASSWORD" -H "$OPENLDAP_URL" -b "$OPENLDAP_BASE_DN" dn
@@ -321,7 +321,7 @@ installRangerOpenSourceHbasePlugin() {
     cp $APP_HOME/conf/ranger-plugin/hbase-template.properties $confFile
     sed -i "s|@EMR_CLUSTER_ID@|$EMR_CLUSTER_ID|g" $confFile
     sed -i "s|@SOLR_HOST@|$SOLR_HOST|g" $confFile
-    sed -i "s|@RANGER_HOST@|$RANGER_HOST|g" $confFile
+    sed -i "s|@RANGER_URL@|$RANGER_URL|g" $confFile
     for node in $(getEmrClusterNodes); do
         printHeading "INSTALL RANGER HBASE PLUGIN ON NODE: [ $masterNode ]: "
         installHome=/opt/ranger-$RANGER_VERSION-hbase-plugin

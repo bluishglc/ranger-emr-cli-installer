@@ -47,3 +47,26 @@ distributeInstaller() {
         sudo mv /tmp/$installer $APP_REMOTE_HOME
 EOSSH
 }
+
+# Be careful! do NOT echo anything except $confirmed
+# because we use it as return value!!
+askForConfirmation() {
+    local message="$1"
+    local answered="false"
+    local confirmed="false"
+    while [[ "$answered" != "true" ]]; do
+        read -p "$message [y/n]: " answer
+        case "$answer" in
+            y|Y)
+                confirmed="true"; answered="true"
+            ;;
+            n|N)
+                confirmed="false"; answered="true"
+            ;;
+            *)
+                confirmed="false"; answered="false"
+            ;;
+        esac
+    done
+    echo $confirmed
+}

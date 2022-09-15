@@ -29,9 +29,7 @@ domains = default
 [domain/default]
 autofs_provider = ldap
 ldap_schema = rfc2307bis
-krb5_realm = $KERBEROS_REALM
 ldap_search_base = $OPENLDAP_BASE_DN
-krb5_server = $KERBEROS_KDC_HOST:88
 id_provider = ldap
 auth_provider = ldap
 chpass_provider = ldap

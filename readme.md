@@ -9,7 +9,7 @@ Author：Laurence Geng　　｜　　Created Date：2020-11-21　　｜　　Upd
 </br>
 </br>
 
-## The documents for brand-new version 2.0 is coming soon...
+# The documents for brand-new version 2.0 is coming soon...
 
 </br>
 </br>

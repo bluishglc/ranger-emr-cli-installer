@@ -5,8 +5,7 @@
 # it can NOT run twice!
 addExampleUsers() {
     printHeading "ADD EXAMPLE USER"
-    testKerberosKdcConnectivity
-
+    testOpenldapSshConnectivity
     distributeInstaller "ec2-user" "$OPENLDAP_HOST"
     ssh -o StrictHostKeyChecking=no -i $SSH_KEY -T ec2-user@$OPENLDAP_HOST \
         sudo sh $APP_REMOTE_HOME/bin/setup.sh add-example-users-on-openldap-local \
@@ -19,18 +18,22 @@ addExampleUsers() {
         --openldap-root-password $OPENLDAP_ROOT_PASSWORD \
         --example-users "$(echo ${EXAMPLE_USERS[*]} | sed -E 's/[[:blank:]]+/,/g')"
 
-    distributeInstaller "hadoop" "$KERBEROS_KDC_HOST"
-    ssh -o StrictHostKeyChecking=no -i $SSH_KEY -T hadoop@$KERBEROS_KDC_HOST \
-        sudo sh $APP_REMOTE_HOME/bin/setup.sh add-example-users-on-kdc-local \
-        --region $REGION \
-        --solution $SOLUTION \
-        --auth-provider $AUTH_PROVIDER \
-        --openldap-host $OPENLDAP_HOST \
-        --openldap-base-dn $OPENLDAP_BASE_DN \
-        --openldap-root-cn $OPENLDAP_ROOT_CN \
-        --openldap-root-password $OPENLDAP_ROOT_PASSWORD \
-        --example-users "$(echo ${EXAMPLE_USERS[*]} | sed -E 's/[[:blank:]]+/,/g')"
-
+    # for emr-native, kerberos is required, so it is also required to
+    # create kerberos mapping principals against openldap accounts.
+    if [[ "$SOLUTION" = "emr-native" ]]; then
+        testKerberosKdcConnectivity
+        distributeInstaller "hadoop" "$KERBEROS_KDC_HOST"
+        ssh -o StrictHostKeyChecking=no -i $SSH_KEY -T hadoop@$KERBEROS_KDC_HOST \
+            sudo sh $APP_REMOTE_HOME/bin/setup.sh add-example-users-on-kdc-local \
+            --region $REGION \
+            --solution $SOLUTION \
+            --auth-provider $AUTH_PROVIDER \
+            --openldap-host $OPENLDAP_HOST \
+            --openldap-base-dn $OPENLDAP_BASE_DN \
+            --openldap-root-cn $OPENLDAP_ROOT_CN \
+            --openldap-root-password $OPENLDAP_ROOT_PASSWORD \
+            --example-users "$(echo ${EXAMPLE_USERS[*]} | sed -E 's/[[:blank:]]+/,/g')"
+    fi
     # manually sync example user to ranger by restart ranger-usersync service
     # otherwise, ranger-usersync auto sync from ad/ldap every 360 minutes.
     # tips, this command should run on ranger server.
@@ -50,7 +53,10 @@ addExampleUsersOnKdcLocal() {
 addExampleUsersOnOpenldapLocal() {
     if [[ "$AUTH_PROVIDER" = "openldap" ]]; then
         addOpenldapUsers
-        updateOpenldapUsersPasswordSetting
+        # for emr-native, kerberos is required, so need unify password of ldap and kerberos
+        if [[ "$SOLUTION" = "emr-native" ]]; then
+            updateOpenldapUsersPasswordSetting
+        fi
     fi
 }
 
