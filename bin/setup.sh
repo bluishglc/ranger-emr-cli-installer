@@ -67,6 +67,7 @@ install() {
 #    if [[ "$AUTH_PROVIDER" = "openldap" && "$SOLUTION" = "emr-native" ]]; then
     waitForCreatingEmrCluster
     testEmrSshConnectivity
+    installRangerPlugins
 #    fi
 
     # If for ad, only need pending and waiting for input cluster id
@@ -112,8 +113,8 @@ install() {
         addExampleUsers
     fi
 
-    installRangerPlugins
-    installRangerPlugins
+#    installRangerPlugins
+
 
     printHeading "ALL DONE!!"
 }

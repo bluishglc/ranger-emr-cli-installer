@@ -225,6 +225,10 @@ installRangerOpenSourceHdfsPlugin() {
             # for emr, we have to copy ranger jars to /usr/lib/hadoop-hdfs/lib/
             sudo find $installHome/lib -name *.jar -exec cp {} /usr/lib/hadoop-hdfs/lib/ \;
             sudo sh $installHome/enable-hdfs-plugin.sh
+            # NOTE: from a certain version of EMR 6.x, a strange issue is: enable hdfs plugin does NOT work anymore
+            # but if enable twice, it will work! both ranger and EMR are changing with version iteration.
+            # I don't want to waste time on the stupid issue anymore, so just enable TWICE!!
+            sudo sh $installHome/enable-hdfs-plugin.sh
 EOF
     done
     restartNamenode
