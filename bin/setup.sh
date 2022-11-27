@@ -20,7 +20,7 @@ export AWS_PAGER=""
 
 OPT_KEYS=(
     REGION ARN_ROOT SSH_KEY ACCESS_KEY_ID SECRET_ACCESS_KEY SOLUTION ENABLE_CROSS_REALM_TRUST TRUSTING_REALM TRUSTING_DOMAIN TRUSTING_HOST RANGER_SECRETS_DIR
-    AUTH_PROVIDER AD_DOMAIN AD_URL AD_BASE_DN RANGER_BIND_DN RANGER_BIND_PASSWORD HUE_BIND_DN HUE_BIND_PASSWORD AD_USER_OBJECT_CLASS
+    AUTH_PROVIDER AD_DOMAIN AD_DOMAIN_ADMIN AD_DOMAIN_ADMIN_PASSWORD AD_URL AD_BASE_DN RANGER_BIND_DN RANGER_BIND_PASSWORD HUE_BIND_DN HUE_BIND_PASSWORD AD_USER_OBJECT_CLASS
     SKIP_INSTALL_OPENLDAP OPENLDAP_URL OPENLDAP_USER_DN_PATTERN OPENLDAP_GROUP_SEARCH_FILTER OPENLDAP_BASE_DN RANGER_BIND_DN RANGER_BIND_PASSWORD HUE_BIND_DN HUE_BIND_PASSWORD OPENLDAP_USER_OBJECT_CLASS
     OPENLDAP_BASE_DN OPENLDAP_ROOT_CN OPENLDAP_ROOT_DN OPENLDAP_ROOT_PASSWORD OPENLDAP_USERS_BASE_DN
     JAVA_HOME SKIP_INSTALL_MYSQL MYSQL_HOST MYSQL_ROOT_PASSWORD MYSQL_RANGER_DB_USER_PASSWORD
@@ -278,7 +278,7 @@ parseArgs() {
         region:,ssh-key:,access-key-id:,secret-access-key:,java-home:,\
         skip-migrate-kerberos-db:,kerberos-realm:,kerberos-kdc-host:,kerberos-kadmin-password:,\
         solution:,enable-cross-realm-trust:,trusting-realm:,trusting-domain:,trusting-host:,ranger-version:,ranger-repo-url:,restart-interval:,ranger-host:,ranger-secrets-dir:,ranger-plugins:,\
-        auth-provider:,ad-host:,ad-domain:,ad-base-dn:,ad-user-object-class:,\
+        auth-provider:,ad-host:,ad-domain:,ad-domain-admin:,ad-domain-admin-password:,ad-base-dn:,ad-user-object-class:,\
         openldap-host:,openldap-base-dn:,openldap-root-cn:,openldap-root-password:,example-users:,\
         sssd-bind-dn:,sssd-bind-password:,\
         skip-install-openldap:,openldap-user-dn-pattern:,openldap-group-search-filter:,openldap-base-dn:,ranger-bind-dn:,ranger-bind-password:,hue-bind-dn:,hue-bind-password:,openldap-user-object-class:,\
@@ -397,6 +397,14 @@ parseArgs() {
                 ;;
             --ad-domain)
                 AD_DOMAIN="$2"
+                shift 2
+                ;;
+            --ad-domain-admin)
+                AD_DOMAIN_ADMIN="$2"
+                shift 2
+                ;;
+            --ad-domain-admin-password)
+                AD_DOMAIN_ADMIN_PASSWORD="$2"
                 shift 2
                 ;;
             --ad-base-dn)

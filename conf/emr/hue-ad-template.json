@@ -12,16 +12,38 @@
             "Configurations": [
               {
                 "Classification": "ldap",
-                "Properties": {
-                  "ldap_url": "@AD_URL@",
-                  "nt_domain": "@AD_DOMAIN@",
-                  "bind_dn": "@HUE_BIND_DN@",
-                  "search_bind_authentication": "true",
-                  "create_users_on_login": "false",
-                  "use_start_tls": "false",
-                  "base_dn": "@AD_BASE_DN@",
-                  "bind_password": "@HUE_BIND_PASSWORD@"
-                }
+                "Properties": {},
+                "Configurations": [
+                  {
+                    "Classification": "ldap_servers",
+                    "Properties": {},
+                    "Configurations": [
+                      {
+                        "Classification": "@ORG_NAME@",
+                        "Properties": {
+                          "ldap_url": "ldap://@AD_HOST@",
+                          "nt_domain": "@AD_DOMAIN@",
+                          "base_dn": "@AD_BASE_DN@",
+                          "bind_dn": "@HUE_BIND_DN@",
+                          "bind_password": "@HUE_BIND_PASSWORD@",
+                          "use_start_tls": "false",
+                          "search_bind_authentication": "true",
+                          "create_users_on_login": "false"
+                        },
+                        "Configurations": [
+                          {
+                            "Classification": "users",
+                            "Properties": {
+                              "user_filter": "objectclass=@AD_USER_OBJECT_CLASS@",
+                              "user_name_attr": "sAMAccountName"
+                            },
+                            "Configurations": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
               },
               {
                 "Classification": "auth",

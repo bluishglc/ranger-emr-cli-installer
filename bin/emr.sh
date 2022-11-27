@@ -70,11 +70,13 @@ configHueAdProps() {
     confFile="$1"
     sed -i "s|@MASTER_INSTANCE_GROUP_ID@|$(getMasterInstanceGroupId)|g" $confFile
     sed -i "s|@MASTER_PRIVATE_FQDN@|$(getEmrMasterNodes)|g" $confFile
+    sed -i "s|@ORG_NAME@|$ORG_NAME|g" $confFile
     sed -i "s|@AD_DOMAIN@|$AD_DOMAIN|g" $confFile
-    sed -i "s|@AD_URL@|$AD_URL|g" $confFile
+    sed -i "s|@AD_HOST@|$AD_HOST|g" $confFile
     sed -i "s|@AD_BASE_DN@|$AD_BASE_DN|g" $confFile
     sed -i "s|@HUE_BIND_DN@|$HUE_BIND_DN|g" $confFile
     sed -i "s|@HUE_BIND_PASSWORD@|$HUE_BIND_PASSWORD|g" $confFile
+    sed -i "s|@AD_USER_OBJECT_CLASS@|$AD_USER_OBJECT_CLASS|g" $confFile
 }
 
 configHueOpenldapProps() {
@@ -84,9 +86,9 @@ configHueOpenldapProps() {
     sed -i "s|@ORG_NAME@|$ORG_NAME|g" $confFile
     sed -i "s|@OPENLDAP_HOST@|$OPENLDAP_HOST|g" $confFile
     sed -i "s|@OPENLDAP_BASE_DN@|$OPENLDAP_BASE_DN|g" $confFile
-    sed -i "s|@OPENLDAP_USER_OBJECT_CLASS@|$OPENLDAP_USER_OBJECT_CLASS|g" $confFile
     sed -i "s|@HUE_BIND_DN@|$HUE_BIND_DN|g" $confFile
     sed -i "s|@HUE_BIND_PASSWORD@|$HUE_BIND_PASSWORD|g" $confFile
+    sed -i "s|@OPENLDAP_USER_OBJECT_CLASS@|$OPENLDAP_USER_OBJECT_CLASS|g" $confFile
 }
 
 configHue() {

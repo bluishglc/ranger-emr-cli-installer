@@ -1,20 +1,28 @@
 #!/bin/bash
 
 installSssd() {
-    installSssdPackages
-    configSssd
+    printHeading "INSTALL SSSD"
+    if [[ "$AUTH_PROVIDER" = "openldap" ]]; then
+        installSssdPackagesForOpenldap
+        configSssdForOpenldap
+    elif [[ "$AUTH_PROVIDER" = "ad" && "$SOLUTION" = "open-source" ]]; then
+        installSssdPackagesForAd
+        joinRealm
+    fi
     configSshdForSssd
     restartSssdRelatedServices
 }
 
-installSssdPackages() {
+# -----------------------------------------    SSSD for AD Operations   ----------------------------------------- #
+
+installSssdPackagesForOpenldap() {
     for node in $(getEmrClusterNodes); do
         ssh -o StrictHostKeyChecking=no -i $SSH_KEY -T hadoop@$node \
         sudo yum -y install openldap-clients sssd sssd-client sssd-ldap sssd-tools authconfig nss-pam-ldapd oddjob-mkhomedir
     done
 }
 
-configSssd() {
+configSssdForOpenldap() {
     for node in $(getEmrClusterNodes); do
         ssh -o StrictHostKeyChecking=no -i $SSH_KEY -T hadoop@$node <<EOSSH
         # first, config with authconfig
@@ -49,6 +57,31 @@ homedir_substring = /home
 [autofs]
 EOF
     sudo chmod 600 /etc/sssd/sssd.conf
+EOSSH
+    done
+}
+
+# --------------------------------------------    SSSD for AD Operations   ------------------------------------------- #
+
+installSssdPackagesForAd() {
+    for node in $(getEmrClusterNodes); do
+        ssh -o StrictHostKeyChecking=no -i $SSH_KEY -T hadoop@$node <<EOSSH
+        sudo yum -y install oddjob oddjob-mkhomedir sssd samba-common-tools adcli krb5-workstation openldap-clients policycoreutils-python realmd
+EOSSH
+    done
+}
+
+joinRealm() {
+    if [[ "$AD_DOMAIN_ADMIN" = "" || "$AD_DOMAIN_ADMIN_PASSWORD" = "" ]]; then
+        echo "ERROR! --ad-domain-admin or --ad-domain-admin-password is not provided!"
+        exit 1
+    fi
+    for node in $(getEmrClusterNodes); do
+        echo "Start to join [ $node] to Windows AD domain, this may take several minutes..."
+        ssh -o StrictHostKeyChecking=no -i $SSH_KEY -T hadoop@$node <<EOSSH
+        # we need disable output by &>/dev/null, otherwise there will be a prompt: "Password for domain-admin: "
+        # this is will deliver error message to users. Actually, the password is input by echo command already!
+        echo $AD_DOMAIN_ADMIN_PASSWORD | sudo realm join -U "$AD_DOMAIN_ADMIN" "$AD_DOMAIN" &>/dev/null
 EOSSH
     done
 }
