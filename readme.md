@@ -16,19 +16,16 @@ In summary, based on the three factors above, there are eight possible scenarios
 
 ![](https://dz2cdn1.dzone.com/storage/temp/16331443-1-8-scenarios-table-small.jpg)
 
-This installer supports first 4 high-applicability scenarios, the following is detailed documents for overview and scenario 1,2,3,4. No matter which one you selected, please read solutions overview first to get a full picture.
-
-No.|Documents
-:---|:--------------
-1|<h4>[Apache Ranger and AWS EMR Automated Installation Series (1): Solutions Overview](https://dzone.com/articles/apache-ranger-aws-emr-automated-installation-1)</h4>
-2|<h4>[Apache Ranger and AWS EMR Automated Installation Series (2): OpenLDAP + EMR-Native Ranger](https://dzone.com/articles/apache-ranger-aws-emr-automated-installation-2)</h4>
-3|<h4>[Apache Ranger and AWS EMR Automated Installation Series (3): Windows AD + EMR-Native Ranger](https://dzone.com/articles/apache-ranger-aws-emr-automated-installation-3)</h4>
-4|<h4>[Apache Ranger and AWS EMR Automated Installation Series (4): OpenLDAP + Open-Source Ranger](https://dzone.com/articles/apache-ranger-aws-emr-automated-installation-4)</h4>
-5|<h4>[Apache Ranger and AWS EMR Automated Installation Series (5): Windows AD + Open-Source Ranger](https://dzone.com/articles/apache-ranger-aws-emr-automated-installation-5)</h4>
-
-
-This installer supports Windows AD and OpenLDAP and works in all AWS regions (including Chinese regions). Especially, for scenarios 3 & 4, it can install ranger on an existing cluster and supports multi-master cluster and single-master cluster both. For each step, this installer always checks connectivity first then decides whether to go for the next steps. This is very helpful to identify network issues or service failure, i.e., when Ranger or OpenLDAP is not up. Finally, the actual installation job is a trial-and-error process. Users always need to try different parameter values to find the one that works in users' environment. The installer allows users to rerun an all-in-one installation anytime without side effects and users can also do a step-by-step run for debugging. The following is a key features summary:
+This installer supports first 4 high-applicability scenarios, supports OpenLDAP & Windows AD both, and works in all AWS regions (including China regions). Especially, for scenarios 3 & 4, it can install ranger on an existing cluster and supports multi-master cluster and single-master cluster both. For each step, this installer always checks connectivity first then decides whether to go for the next steps. This is very helpful to identify network issues or service failure, i.e., when Ranger or OpenLDAP is not up. Finally, the actual installation job is a trial-and-error process. Users always need to try different parameter values to find the one that works in users' environment. The installer allows users to rerun an all-in-one installation anytime without side effects and users can also do a step-by-step run for debugging. The following is a key features summary:
 
 ![](https://dz2cdn1.dzone.com/storage/temp/16538007-25-feature-list.jpg)
 
-For scenarios 5 and 6, as of this writing, EMR is not yet supported. Since disabling Kerberos on EMR cluster is not a recommended practice, the AWS service team is working on a solution to meet the needs. For scenarios 7 and 8, considering few users pick them, we won't discuss them. 
+The following is detailed documents for overview and scenario 1,2,3,4. No matter which one you selected, please read solutions overview first so as to get a full picture.
+
+|No.|Detailed Documents|
+|:---:|:--------------|
+|<h4>1</h4>|<h4>[Apache Ranger and AWS EMR Automated Installation Series (1): Solutions Overview](https://dzone.com/articles/apache-ranger-aws-emr-automated-installation-1)</h4>|
+|<h4>2</h4>|<h4>[Apache Ranger and AWS EMR Automated Installation Series (2): OpenLDAP + EMR-Native Ranger](https://dzone.com/articles/apache-ranger-aws-emr-automated-installation-2)</h4>|
+|<h4>3</h4>|<h4>[Apache Ranger and AWS EMR Automated Installation Series (3): Windows AD + EMR-Native Ranger](https://dzone.com/articles/apache-ranger-aws-emr-automated-installation-3)</h4>|
+|<h4>4</h4>|<h4>[Apache Ranger and AWS EMR Automated Installation Series (4): OpenLDAP + Open-Source Ranger](https://dzone.com/articles/apache-ranger-aws-emr-automated-installation-4)</h4>|
+|<h4>5</h4>|<h4>[Apache Ranger and AWS EMR Automated Installation Series (5): Windows AD + Open-Source Ranger](https://dzone.com/articles/apache-ranger-aws-emr-automated-installation-5)</h4>|
