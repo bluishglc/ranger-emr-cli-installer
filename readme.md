@@ -1,11 +1,5 @@
 # An Installer for Apache Ranger and AWS EMR Automated Installation and Integration with OpenLDAP & Windows AD
 
----
-
-Author：Laurence Geng　　｜　　Created Date：2020-11-21　　｜　　Updated Date：2023-01-30
-
----
-
 This is a powerful cli tool for Apache Ranger and AWS EMR automated installation & integration with OpenLDAP & Windows AD. It can complete 3 major jobs automatically:
 
 1. Install and integrate an authentication provider.
@@ -26,7 +20,7 @@ This installer supports first 4 high-applicability scenarios, the following is d
 
 No.|Documents
 :---|:--------------
-1|[Apache Ranger and AWS EMR Automated Installation and Integration Series (1): Solutions Overview](https://dzone.com/articles/apache-ranger-aws-emr-automated-installation-1)
+1|[Apache Ranger and AWS EMR Automated Installation and Integration Series (1): Solutions Overview](https://dzone.com/articles/apache-ranger-aws-emr-automated-installation-1)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 2|[Apache Ranger and AWS EMR Automated Installation and Integration Series (2): OpenLDAP + EMR-Native Ranger](https://dzone.com/articles/apache-ranger-aws-emr-automated-installation-2)
 3|[Apache Ranger and AWS EMR Automated Installation and Integration Series (3): Windows AD + EMR-Native Ranger](https://dzone.com/articles/apache-ranger-aws-emr-automated-installation-3)
 4|[Apache Ranger and AWS EMR Automated Installation and Integration Series (4): OpenLDAP + Open-Source Ranger](https://dzone.com/articles/apache-ranger-aws-emr-automated-installation-4)
